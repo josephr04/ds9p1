@@ -1,0 +1,9 @@
+backend/vendor/
+backend/.env
+backend/storage/logs/
+backend/bootstrap/cache/
+android/.gradle/
+android/app/build/
+android/local.properties
+.DS_Store
+Thumbs.db
