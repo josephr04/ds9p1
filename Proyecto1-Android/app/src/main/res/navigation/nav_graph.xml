@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/tiendaFragment">
+
+    <fragment
+        android:id="@+id/tiendaFragment"
+        android:name="com.example.proyecto1_android.ui.tienda.TiendaFragment"
+        android:label="Tienda"
+        tools:layout="@layout/fragment_tienda">
+
+        <!-- Acción: Tienda → Detalle (pasa el ID del producto) -->
+        <action
+            android:id="@+id/action_tienda_to_detalle"
+            app:destination="@id/detalleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detalleFragment"
+        android:name="com.example.proyecto1_android.ui.detalle.DetalleFragment"
+        android:label="Detalle"
+        tools:layout="@layout/fragment_detalle">
+
+        <!-- Argumento — equivalente a $_GET['id'] en detalle.php -->
+        <argument
+            android:name="idProducto"
+            app:argType="long" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/carritoFragment"
+        android:name="com.example.proyecto1_android.ui.carrito.CarritoFragment"
+        android:label="Carrito"
+        tools:layout="@layout/fragment_carrito" />
+
+</navigation>
