@@ -1,15 +1,59 @@
 <?php
-require_once "config/conexion.php";
-include "includes/head.php";
-?>
-<?php
-$porPagina = 5;
-$paginaActual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
-$offset = ($paginaActual - 1) * $porPagina;
+if (session_status() === PHP_SESSION_NONE) session_start();
 
-$totalResult = $conexion->query("SELECT COUNT(*) as total FROM productos");
-$totalProductos = $totalResult->fetch_object()->total;
-$totalPaginas = ceil($totalProductos / $porPagina);
+// Solo admins (rol 1) pueden entrar
+if (!isset($_SESSION['empleado']) || $_SESSION['empleado']['rol'] != 1) {
+    header('Location: store.php');
+    exit;
+}
+
+include "includes/head.php";
+
+// Paginación
+$porPagina    = 5;
+$paginaActual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+$offset       = ($paginaActual - 1) * $porPagina;
+
+$apiBase = "http://127.0.0.1:8000/api";
+
+// Obtener TODOS los productos para calcular el total (para paginación)
+$todosProductos = json_decode(@file_get_contents("$apiBase/productos"), true) ?? [];
+$totalProductos = count($todosProductos);
+$totalPaginas   = ceil($totalProductos / $porPagina);
+
+// Paginar manualmente el slice
+$productosPagina = array_slice($todosProductos, $offset, $porPagina);
+
+// Marcas y Categorías desde la API
+$marcas     = json_decode(@file_get_contents("$apiBase/marcas"), true) ?? [];
+$categorias = json_decode(@file_get_contents("$apiBase/categorias"), true) ?? [];
+
+// Fallback: extraer marcas/categorías únicas de los productos si no hay endpoint propio
+if (empty($marcas)) {
+    $marcaMap = [];
+    foreach ($todosProductos as $p) {
+        $mid = $p['idMarca'];
+        if (!isset($marcaMap[$mid])) {
+            $marcaMap[$mid] = $p['marca']['nombreMarc'];
+        }
+    }
+    foreach ($marcaMap as $id => $nombre) {
+        $marcas[] = ['idMarca' => $id, 'nombreMarc' => $nombre];
+    }
+}
+
+if (empty($categorias)) {
+    $catMap = [];
+    foreach ($todosProductos as $p) {
+        $cid = $p['idCategoria'];
+        if (!isset($catMap[$cid])) {
+            $catMap[$cid] = $p['categoria']['nombreCat'];
+        }
+    }
+    foreach ($catMap as $id => $nombre) {
+        $categorias[] = ['idCategoria' => $id, 'nombreCat' => $nombre];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -150,7 +194,7 @@ $totalPaginas = ceil($totalProductos / $porPagina);
             </div>
         </div>
 
-        <!-- ✅ ALERTAS CON MOTIVO DETALLADO -->
+        <!-- ALERTAS -->
         <?php if (isset($_GET['res'])): ?>
             <div class="row">
                 <div class="col-12">
@@ -161,19 +205,19 @@ $totalPaginas = ceil($totalProductos / $porPagina);
                                 <strong class="d-block">¡Operación Exitosa!</strong>
                                 <span class="small">El producto ha sido guardado correctamente.</span>
                             </div>
-                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
                         </div>
                     <?php elseif ($_GET['res'] == 'error'): ?>
                         <?php
                         $motivo = $_GET['motivo'] ?? '';
                         if ($motivo === 'duplicado') {
-                            $titulo = "Código de barras duplicado";
+                            $titulo  = "Código de barras duplicado";
                             $detalle = "Ese código ya existe en la base de datos.";
                         } elseif ($motivo === 'imagen') {
-                            $titulo = "Formato de imagen no válido";
+                            $titulo  = "Formato de imagen no válido";
                             $detalle = "Solo se permiten imágenes JPG o PNG.";
                         } else {
-                            $titulo = "Hubo un problema";
+                            $titulo  = "Hubo un problema";
                             $detalle = "No se pudo completar el registro. Verifica los datos e intenta de nuevo.";
                         }
                         ?>
@@ -183,12 +227,11 @@ $totalPaginas = ceil($totalProductos / $porPagina);
                                 <strong class="d-block"><?= $titulo ?></strong>
                                 <span class="small"><?= $detalle ?></span>
                             </div>
-                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
                         </div>
                     <?php endif; ?>
                 </div>
             </div>
-
             <script>
                 setTimeout(() => {
                     const url = new URL(window.location);
@@ -209,7 +252,6 @@ $totalPaginas = ceil($totalProductos / $porPagina);
                         </div>
                         <h5 class="mb-0 fw-bold">Nuevo Producto</h5>
                     </div>
-
 
                     <form action="model/registrar.php" method="POST" enctype="multipart/form-data">
 
@@ -237,29 +279,25 @@ $totalPaginas = ceil($totalProductos / $porPagina);
                             </div>
                         </div>
 
+                        <!-- Marcas desde la API -->
                         <div class="mb-3">
                             <label class="form-label">Marca</label>
                             <select name="marca" class="form-select" required>
                                 <option value="" disabled selected>Seleccione una marca</option>
-                                <?php
-                                $marcas = $conexion->query("SELECT * FROM marca");
-                                while ($m = $marcas->fetch_object()) {
-                                    echo "<option value='$m->idMarca'>$m->nombreMarc</option>";
-                                }
-                                ?>
+                                <?php foreach ($marcas as $m): ?>
+                                    <option value="<?= $m['idMarca'] ?>"><?= htmlspecialchars($m['nombreMarc']) ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
 
+                        <!-- Categorías desde la API -->
                         <div class="mb-3">
                             <label class="form-label">Categoría</label>
                             <select name="categoria" class="form-select" required>
                                 <option value="" disabled selected>Seleccione una categoría</option>
-                                <?php
-                                $categorias = $conexion->query("SELECT * FROM categoria");
-                                while ($cat = $categorias->fetch_object()) {
-                                    echo "<option value='$cat->idCategoria'>$cat->nombreCat</option>";
-                                }
-                                ?>
+                                <?php foreach ($categorias as $cat): ?>
+                                    <option value="<?= $cat['idCategoria'] ?>"><?= htmlspecialchars($cat['nombreCat']) ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
 
@@ -312,42 +350,41 @@ $totalPaginas = ceil($totalProductos / $porPagina);
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php
-                                $sql = $conexion->query("
-                                    SELECT p.*, c.nombreCat 
-                                    FROM productos p 
-                                    LEFT JOIN categoria c ON p.idCategoria = c.idCategoria
-                                    LIMIT $porPagina OFFSET $offset
-                                ");
-                                while ($datos = $sql->fetch_object()) { ?>
+                                <?php foreach ($productosPagina as $datos): ?>
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="<?= 'http://localhost/Proyecto%201/imagenes/' . $datos->imagen ?>" class="product-img me-3" width="48" height="48">
+                                                <img src="<?= 'http://localhost/ds9p1/Proyecto1/imagenes/' . htmlspecialchars($datos['imagen']) ?>"
+                                                    class="product-img me-3" width="48" height="48">
                                                 <div>
-                                                    <div class="fw-bold"><?= htmlspecialchars($datos->nombre) ?></div>
-                                                    <small class="text-muted text-uppercase" style="font-size: 10px;">ID: #<?= $datos->idProducto ?></small>
+                                                    <div class="fw-bold"><?= htmlspecialchars($datos['nombre']) ?></div>
+                                                    <small class="text-muted text-uppercase" style="font-size: 10px;">ID: #<?= $datos['idProducto'] ?></small>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <span class="badge bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-2">
-                                                <?= htmlspecialchars($datos->nombreCat) ?>
+                                                <?= htmlspecialchars($datos['categoria']['nombreCat']) ?>
                                             </span>
                                         </td>
-                                        <td class="fw-bold">$<?= number_format($datos->precioCosto, 2) ?></td>
+                                        <td class="fw-bold">$<?= number_format((float)$datos['precioCosto'], 2) ?></td>
                                         <td class="text-end">
                                             <div class="btn-group shadow-sm border rounded-3 p-1 bg-white">
-                                                <button class="btn btn-link btn-sm text-warning p-1" onclick="editarProducto('<?= $datos->idProducto ?>')">
+                                                <button class="btn btn-link btn-sm text-warning p-1" onclick="editarProducto('<?= $datos['idProducto'] ?>')">
                                                     <i class="bi bi-pencil-square fs-5"></i>
                                                 </button>
-                                                <button class="btn btn-link btn-sm text-danger p-1" onclick="eliminarProducto('<?= $datos->idProducto ?>')">
+                                                <button class="btn btn-link btn-sm text-danger p-1" onclick="eliminarProducto('<?= $datos['idProducto'] ?>')">
                                                     <i class="bi bi-trash3 fs-5"></i>
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
-                                <?php } ?>
+                                <?php endforeach; ?>
+                                <?php if (empty($productosPagina)): ?>
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">No hay productos registrados.</td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -405,7 +442,6 @@ $totalPaginas = ceil($totalProductos / $porPagina);
                 </div>
                 <div class="modal-footer border-top-0 p-4 pt-0">
                     <button class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <!-- ✅ Spinner de carga visible durante el guardado -->
                     <button class="btn btn-primary-custom px-4" id="btnGuardar" onclick="guardarEdicion()">
                         <span id="btnGuardarTexto"><i class="bi bi-check2 me-1"></i>Actualizar</span>
                         <span id="btnGuardarSpinner" class="d-none">
@@ -421,33 +457,37 @@ $totalPaginas = ceil($totalProductos / $porPagina);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
 
     <script>
+        const API_BASE = "http://127.0.0.1:8000/api";
+
         // ============================================================
-        // EDITAR PRODUCTO — abre el modal con los datos actuales
+        // EDITAR PRODUCTO — consulta la API por ID
         // ============================================================
         function editarProducto(id) {
-            fetch("controllers/obtenerProductoController.php?id=" + id)
-                .then(res => res.json())
+            fetch(`${API_BASE}/productos/${id}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("No encontrado");
+                    return res.json();
+                })
                 .then(data => {
-                    document.getElementById("edit_id").value = data.idProducto;
+                    document.getElementById("edit_id").value    = data.idProducto;
                     document.getElementById("edit_nombre").value = data.nombre;
                     document.getElementById("edit_unidad").value = data.unidad;
                     document.getElementById("edit_precio").value = data.precioCosto;
                     document.getElementById("modalMensaje").innerHTML = "";
 
-                    let modal = new bootstrap.Modal(document.getElementById('modalEditar'));
-                    modal.show();
+                    new bootstrap.Modal(document.getElementById('modalEditar')).show();
                 })
                 .catch(() => alert("Error al obtener los datos del producto."));
         }
 
         // ============================================================
-        // GUARDAR EDICIÓN — hace el POST al backend y recarga la tabla
+        // GUARDAR EDICIÓN — PUT a la API
         // ============================================================
         function guardarEdicion() {
-            let id = document.getElementById("edit_id").value;
-            let nombre = document.getElementById("edit_nombre").value.trim();
-            let unidad = document.getElementById("edit_unidad").value.trim();
-            let precio = document.getElementById("edit_precio").value;
+            const id     = document.getElementById("edit_id").value;
+            const nombre = document.getElementById("edit_nombre").value.trim();
+            const unidad = document.getElementById("edit_unidad").value.trim();
+            const precio = document.getElementById("edit_precio").value;
 
             if (!nombre || !unidad || !precio) {
                 document.getElementById("modalMensaje").innerHTML = `
@@ -457,122 +497,102 @@ $totalPaginas = ceil($totalProductos / $porPagina);
                 return;
             }
 
-            // Mostrar spinner
             document.getElementById("btnGuardarTexto").classList.add("d-none");
             document.getElementById("btnGuardarSpinner").classList.remove("d-none");
             document.getElementById("btnGuardar").disabled = true;
 
-            let formData = new FormData();
-            formData.append("id", id);
-            formData.append("nombre", nombre);
-            formData.append("unidad", unidad);
-            formData.append("precio", precio);
-
-            fetch("controllers/actualizarProductoController.php", {
-                    method: "POST",
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.ok) {
-                        bootstrap.Modal.getInstance(document.getElementById('modalEditar')).hide();
-                        location.reload();
-                    } else {
-                        document.getElementById("modalMensaje").innerHTML = `
-                        <div class="alert alert-danger alert-modern py-2 mb-3">
-                            <i class="bi bi-x-circle me-2"></i>${data.mensaje}
-                        </div>`;
-                    }
-                })
-                .catch(() => {
-                    document.getElementById("modalMensaje").innerHTML = `
+            fetch(`${API_BASE}/productos/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nombre, unidad, precioCosto: precio })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Error al actualizar");
+                return res.json();
+            })
+            .then(() => {
+                bootstrap.Modal.getInstance(document.getElementById('modalEditar')).hide();
+                location.reload();
+            })
+            .catch(() => {
+                document.getElementById("modalMensaje").innerHTML = `
                     <div class="alert alert-danger alert-modern py-2 mb-3">
-                        <i class="bi bi-wifi-off me-2"></i>Error de conexión al guardar.
+                        <i class="bi bi-x-circle me-2"></i>No se pudo actualizar el producto.
                     </div>`;
-                })
-                .finally(() => {
-                    // Restaurar botón
-                    document.getElementById("btnGuardarTexto").classList.remove("d-none");
-                    document.getElementById("btnGuardarSpinner").classList.add("d-none");
-                    document.getElementById("btnGuardar").disabled = false;
-                });
+            })
+            .finally(() => {
+                document.getElementById("btnGuardarTexto").classList.remove("d-none");
+                document.getElementById("btnGuardarSpinner").classList.add("d-none");
+                document.getElementById("btnGuardar").disabled = false;
+            });
         }
 
         // ============================================================
-        // ELIMINAR PRODUCTO
+        // ELIMINAR PRODUCTO — DELETE a la API
         // ============================================================
         function eliminarProducto(id) {
             if (confirm('¿Desea eliminar este producto? Esta acción no se puede deshacer.')) {
-                fetch("controllers/eliminarProductoController.php?id=" + encodeURIComponent(id))
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.ok) {
-                            location.reload();
-                        } else {
-                            alert("Error al eliminar: " + data.mensaje);
-                        }
+                fetch(`${API_BASE}/productos/${id}`, { method: "DELETE" })
+                    .then(res => {
+                        if (!res.ok) throw new Error("Error al eliminar");
+                        location.reload();
                     })
                     .catch(() => alert("Error de conexión al intentar eliminar."));
             }
         }
 
         // ============================================================
-        // BÚSQUEDA AUTOMÁTICA POR CÓDIGO (al escribir)
+        // BÚSQUEDA POR CÓDIGO — consulta la API
         // ============================================================
         let timeout;
 
         document.getElementById("codigo").addEventListener("input", function() {
-            let codigo = this.value.trim();
+            const codigo = this.value.trim();
             clearTimeout(timeout);
 
-            if (codigo === "") {
-                limpiarFormulario();
-                return;
-            }
+            if (codigo === "") { limpiarFormulario(); return; }
 
-            timeout = setTimeout(() => {
-                fetch("controllers/ProductoController.php?codigo=" + encodeURIComponent(codigo))
-                    .then(res => res.json())
-                    .then(data => mostrarResultadoBusqueda(data))
-                    .catch(() => {
-                        let mensaje = document.getElementById("mensaje");
-                        mensaje.innerHTML = `
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-wifi-off fs-5"></i>
-                                <div><strong>Error de conexión</strong><br>
-                                <small>No se pudo consultar el servidor.</small></div>
-                            </div>`;
-                        mensaje.className = "alert alert-danger mt-2";
-                    });
-            }, 400);
+            timeout = setTimeout(() => buscarPorCodigo(codigo), 400);
         });
 
-        // BÚSQUEDA CON LECTOR FÍSICO (tecla Enter)
         document.getElementById("codigo").addEventListener("keydown", function(e) {
             if (e.keyCode === 13) {
                 e.preventDefault();
-                let codigo = this.value.trim();
-                if (codigo !== "") {
-                    clearTimeout(timeout); // Cancelar el debounce pendiente
-                    fetch("controllers/ProductoController.php?codigo=" + encodeURIComponent(codigo))
-                        .then(res => res.json())
-                        .then(data => mostrarResultadoBusqueda(data))
-                        .catch(err => console.error("Error:", err));
-                }
+                const codigo = this.value.trim();
+                if (codigo !== "") { clearTimeout(timeout); buscarPorCodigo(codigo); }
             }
         });
 
-        // Función compartida para mostrar resultado de búsqueda
+        function buscarPorCodigo(codigo) {
+            fetch(`${API_BASE}/productos/${codigo}`)
+                .then(res => {
+                    if (res.status === 404) return { existe: false };
+                    if (!res.ok) throw new Error("Error de red");
+                    return res.json().then(data => ({ ...data, existe: true }));
+                })
+                .then(data => mostrarResultadoBusqueda(data))
+                .catch(() => {
+                    const mensaje = document.getElementById("mensaje");
+                    mensaje.innerHTML = `
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-wifi-off fs-5"></i>
+                            <div><strong>Error de conexión</strong><br>
+                            <small>No se pudo consultar el servidor.</small></div>
+                        </div>`;
+                    mensaje.className = "alert alert-danger mt-2";
+                });
+        }
+
         function mostrarResultadoBusqueda(data) {
-            let mensaje = document.getElementById("mensaje");
+            const mensaje = document.getElementById("mensaje");
 
             if (data.existe) {
-                document.querySelector("[name='nombre']").value = data.nombre;
-                document.querySelector("[name='unidad']").value = data.unidad;
+                document.querySelector("[name='nombre']").value      = data.nombre;
+                document.querySelector("[name='unidad']").value      = data.unidad;
                 document.querySelector("[name='descripcion']").value = data.descripcion;
 
-                document.querySelector("[name='nombre']").readOnly = true;
-                document.querySelector("[name='unidad']").readOnly = true;
+                document.querySelector("[name='nombre']").readOnly      = true;
+                document.querySelector("[name='unidad']").readOnly      = true;
                 document.querySelector("[name='descripcion']").readOnly = true;
 
                 mensaje.innerHTML = `
@@ -582,7 +602,6 @@ $totalPaginas = ceil($totalProductos / $porPagina);
                         <small>Este código ya existe en la base de datos.</small></div>
                     </div>`;
                 mensaje.className = "alert alert-success mt-2";
-
             } else {
                 limpiarFormulario(false);
                 mensaje.innerHTML = `
@@ -601,15 +620,12 @@ $totalPaginas = ceil($totalProductos / $porPagina);
         // ============================================================
         function limpiarFormulario(limpiarCodigo = true) {
             if (limpiarCodigo) document.getElementById("codigo").value = "";
-
-            document.querySelector("[name='nombre']").value = "";
-            document.querySelector("[name='unidad']").value = "";
+            document.querySelector("[name='nombre']").value      = "";
+            document.querySelector("[name='unidad']").value      = "";
             document.querySelector("[name='descripcion']").value = "";
-
-            document.querySelector("[name='nombre']").readOnly = false;
-            document.querySelector("[name='unidad']").readOnly = false;
+            document.querySelector("[name='nombre']").readOnly      = false;
+            document.querySelector("[name='unidad']").readOnly      = false;
             document.querySelector("[name='descripcion']").readOnly = false;
-
             document.getElementById("mensaje").innerHTML = "";
             document.getElementById("mensaje").className = "";
         }
