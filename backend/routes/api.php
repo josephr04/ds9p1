@@ -18,6 +18,8 @@ Route::get('/marcas/{id}', [MarcaController::class, 'show']);
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::get('/productos/{id}', [ProductoController::class, 'show']);
 
+Route::post('login', [EmpleadoController::class, 'login']);
+
 // ─── PROTEGIDOS ──────────────────────────────────────────
 Route::apiResource('categorias', CategoriaController::class)->except(['index', 'show']);
 Route::apiResource('marcas',     MarcaController::class)->except(['index', 'show']);
