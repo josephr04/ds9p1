@@ -1,13 +1,8 @@
 <?php
-/**
- * PÁGINA DE DETALLE DE PRODUCTO
- * Ubicación: /detalle.php
- */
 session_start();
-require_once "config/conexion.php";
 include "includes/head.php";
 
-// 1. Obtener y validar el ID del producto desde la URL
+// 1. Validar el ID del producto desde la URL
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     header("Location: store.php");
     exit;
@@ -15,22 +10,22 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $idProducto = (int)$_GET['id'];
 
-// 2. Consultar la información del producto y su categoría
-$query = "SELECT p.*, c.nombreCat 
-          FROM productos p 
-          LEFT JOIN categoria c ON p.idCategoria = c.idCategoria 
-          WHERE p.idProducto = $idProducto 
-          LIMIT 1";
+// 2. Consultar el producto desde la API
+$apiBase  = "http://127.0.0.1:8000/api";
+$response = @file_get_contents("$apiBase/productos/$idProducto");
 
-$resultado = $conexion->query($query);
-
-// Si el producto no existe, redirigir a la tienda
-if ($resultado->num_rows == 0) {
+// Si el producto no existe o la API falla, redirigir a la tienda
+if (!$response) {
     header("Location: store.php");
     exit;
 }
 
-$p = $resultado->fetch_object();
+$p = json_decode($response, true);
+
+if (empty($p) || isset($p['error'])) {
+    header("Location: store.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -39,8 +34,8 @@ $p = $resultado->fetch_object();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $p->nombre ?> | High Fidelity Detail</title>
-    
+    <title><?= htmlspecialchars($p['nombre']) ?> | High Fidelity Detail</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -75,7 +70,7 @@ $p = $resultado->fetch_object();
         .product-image-container img {
             max-width: 100%;
             height: auto;
-            mix-blend-mode: multiply; 
+            mix-blend-mode: multiply;
             transition: transform 0.5s ease;
         }
 
@@ -139,9 +134,8 @@ $p = $resultado->fetch_object();
             box-shadow: 0 10px 20px -10px rgba(79, 70, 229, 0.5);
         }
 
-        .stock-info { font-size: 0.9rem; color: #10b981; font-weight: 600; }
+        .stock-info { font-size: 0.9rem; font-weight: 600; }
 
-        /* Toast Estilo Tienda */
         #cart-toast {
             position: fixed;
             bottom: 20px;
@@ -167,23 +161,31 @@ $p = $resultado->fetch_object();
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="store.php">Tienda</a></li>
-                <li class="breadcrumb-item"><a href="store.php?cat=<?= $p->idCategoria ?>"><?= $p->nombreCat ?></a></li>
-                <li class="breadcrumb-item active" aria-current="page"><?= $p->nombre ?></li>
+                <li class="breadcrumb-item">
+                    <a href="store.php?cat=<?= $p['idCategoria'] ?>">
+                        <?= htmlspecialchars($p['categoria']['nombreCat']) ?>
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($p['nombre']) ?></li>
             </ol>
         </nav>
 
         <div class="row g-5">
+            <!-- IMAGEN -->
             <div class="col-lg-6">
                 <div class="product-image-container shadow-sm">
-                    <img src="imagenes/<?= $p->imagen ?>" id="main-product-img" alt="<?= $p->nombre ?>">
+                    <img src="imagenes/<?= htmlspecialchars($p['imagen']) ?>"
+                         id="main-product-img"
+                         alt="<?= htmlspecialchars($p['nombre']) ?>">
                 </div>
             </div>
 
+            <!-- INFO -->
             <div class="col-lg-6">
                 <div class="ps-lg-4">
-                    <span class="category-badge"><?= $p->nombreCat ?></span>
-                    <h1 class="product-title"><?= $p->nombre ?></h1>
-                    
+                    <span class="category-badge"><?= htmlspecialchars($p['categoria']['nombreCat']) ?></span>
+                    <h1 class="product-title"><?= htmlspecialchars($p['nombre']) ?></h1>
+
                     <div class="d-flex align-items-center mb-4">
                         <div class="text-warning me-2">
                             <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
@@ -191,13 +193,22 @@ $p = $resultado->fetch_object();
                         <span class="text-muted small">(4.5/5 de 12 opiniones)</span>
                     </div>
 
-                    <div class="product-price">$<?= number_format($p->precioVenta, 2) ?></div>
-                    
-                    <p class="product-description"><?= $p->descripcion ?></p>
+                    <div class="product-price">$<?= number_format((float)$p['precioVenta'], 2) ?></div>
 
-                    <div class="stock-info mb-4">
-                        <i class="bi bi-check2-circle me-1"></i> En stock - Disponible para entrega inmediata
-                    </div>
+                    <p class="product-description"><?= htmlspecialchars($p['descripcion']) ?></p>
+
+                    <?php
+                        $stock = (int)$p['stock'];
+                        if ($stock > 0): ?>
+                        <div class="stock-info text-success mb-4">
+                            <i class="bi bi-check2-circle me-1"></i>
+                            En stock (<?= $stock ?> disponibles) - Disponible para entrega inmediata
+                        </div>
+                    <?php else: ?>
+                        <div class="stock-info text-danger mb-4">
+                            <i class="bi bi-x-circle me-1"></i> Sin stock
+                        </div>
+                    <?php endif; ?>
 
                     <hr class="my-4">
 
@@ -212,7 +223,10 @@ $p = $resultado->fetch_object();
                         </div>
                         <div class="col-sm-8 mb-3">
                             <label class="form-label d-none d-sm-block">&nbsp;</label>
-                            <button type="button" class="btn-add-cart btn-agregar" data-id="<?= $p->idProducto ?>">
+                            <button type="button"
+                                    class="btn-add-cart btn-agregar"
+                                    data-id="<?= $p['idProducto'] ?>"
+                                    <?= $stock === 0 ? 'disabled' : '' ?>>
                                 <i class="bi bi-cart-plus me-2"></i> Añadir al Carrito
                             </button>
                         </div>
@@ -237,6 +251,7 @@ $p = $resultado->fetch_object();
         </div>
     </div>
 
+    <!-- ESPECIFICACIONES -->
     <section class="bg-light py-5 mt-5">
         <div class="container">
             <h4 class="fw-bold mb-4">Especificaciones Técnicas</h4>
@@ -245,11 +260,23 @@ $p = $resultado->fetch_object();
                     <table class="table table-borderless">
                         <tr>
                             <td class="text-muted fw-bold">Categoría:</td>
-                            <td><?= $p->nombreCat ?></td>
+                            <td><?= htmlspecialchars($p['categoria']['nombreCat']) ?></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-bold">Marca:</td>
+                            <td><?= htmlspecialchars($p['marca']['nombreMarc']) ?></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-bold">Unidad:</td>
+                            <td><?= htmlspecialchars($p['unidad']) ?></td>
                         </tr>
                         <tr>
                             <td class="text-muted fw-bold">Modelo:</td>
-                            <td>HF-<?= $p->idProducto ?>-2026</td>
+                            <td>HF-<?= $p['idProducto'] ?>-2026</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-bold">Stock:</td>
+                            <td><?= $p['stock'] ?> unidades</td>
                         </tr>
                     </table>
                 </div>
@@ -262,7 +289,6 @@ $p = $resultado->fetch_object();
     </footer>
 
     <script>
-        // Función para los botones + y -
         function updateQty(val) {
             const qtyInput = document.getElementById('product-qty');
             let current = parseInt(qtyInput.value);
@@ -271,36 +297,30 @@ $p = $resultado->fetch_object();
             qtyInput.value = current;
         }
 
-        // Lógica AJAX (Igual que en store.php)
         document.addEventListener('click', function(e) {
             const btn = e.target.closest('.btn-agregar');
-            
+
             if (btn) {
                 e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                const cantidad = document.getElementById('product-qty').value; 
-                const toast = document.getElementById('cart-toast');
+                const id       = btn.getAttribute('data-id');
+                const cantidad = document.getElementById('product-qty').value;
+                const toast    = document.getElementById('cart-toast');
 
-                // Enviamos ID y CANTIDAD al controlador
                 fetch(`controllers/carritoController.php?accion=agregar&id=${id}&cantidad=${cantidad}`)
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
-                            // 1. Mostrar notificación
-                            if(toast) {
+                            if (toast) {
                                 toast.style.display = 'block';
                                 setTimeout(() => { toast.style.display = 'none'; }, 2000);
                             }
 
-                            // 2. Actualizar el badge en el head.php
                             const cartBadge = document.querySelector('.badge-carrito');
                             if (cartBadge) {
                                 cartBadge.innerText = data.cart_count;
                                 cartBadge.style.display = 'block';
-                                
-                                // Animación de feedback
                                 cartBadge.style.transition = "transform 0.2s ease";
-                                cartBadge.style.transform = "translate(-50%, -50%) scale(1.4)";
+                                cartBadge.style.transform  = "translate(-50%, -50%) scale(1.4)";
                                 setTimeout(() => {
                                     cartBadge.style.transform = "translate(-50%, -50%) scale(1)";
                                 }, 200);

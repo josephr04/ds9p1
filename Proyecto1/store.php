@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once "config/conexion.php";
 include "includes/head.php";
 
 // Lógica de Categoría
@@ -13,6 +12,22 @@ if (isset($_GET['cat'])) {
 if (!isset($_SESSION['carrito'])) {
     $_SESSION['carrito'] = [];
 }
+
+// ─── Obtener productos desde la API ───────────────────────────────────────────
+$apiBase = "http://127.0.0.1:8000/api";
+
+// Construir URL según si hay categoría seleccionada
+$urlProductos = $idCatSeleccionada
+    ? "$apiBase/productos?categoria_id=$idCatSeleccionada"
+    : "$apiBase/productos";
+
+$responseProductos = @file_get_contents($urlProductos);
+$productos = $responseProductos ? json_decode($responseProductos, true) : [];
+
+// ─── Obtener categorías desde la API ─────────────────────────────────────────
+$urlCategorias = "$apiBase/categorias";
+$responseCategorias = @file_get_contents($urlCategorias);
+$categorias = $responseCategorias ? json_decode($responseCategorias, true) : [];
 ?>
 
 <!DOCTYPE html>
@@ -187,7 +202,6 @@ if (!isset($_SESSION['carrito'])) {
             color: var(--primary);
         }
 
-        /* Toast de notificación rápida */
         #cart-toast {
             position: fixed;
             bottom: 20px;
@@ -218,79 +232,76 @@ if (!isset($_SESSION['carrito'])) {
             <aside class="col-lg-3 pe-lg-5 mb-5">
                 <h6 class="sidebar-title">Colecciones</h6>
                 <nav>
-                    <a href="tienda.php?cat=0" class="filter-link <?= !$idCatSeleccionada ? 'active' : '' ?>">
+                    <a href="store.php?cat=0" class="filter-link <?= !$idCatSeleccionada ? 'active' : '' ?>">
                         Todos los productos <i class="bi bi-chevron-right small"></i>
                     </a>
-                    <?php
-                    $categorias = $conexion->query("SELECT * FROM categoria");
-                    while ($c = $categorias->fetch_object()) {
-                        $active = ($idCatSeleccionada == $c->idCategoria) ? 'active' : '';
-                        echo "<a href='tienda.php?cat=$c->idCategoria' class='filter-link $active'>
-                                $c->nombreCat <i class='bi bi-chevron-right small'></i>
-                              </a>";
-                    }
-                    ?>
+                    <?php foreach ($categorias as $c): ?>
+                        <?php $active = ($idCatSeleccionada == $c['idCategoria']) ? 'active' : ''; ?>
+                        <a href="store.php?cat=<?= $c['idCategoria'] ?>" class="filter-link <?= $active ?>">
+                            <?= htmlspecialchars($c['nombreCat']) ?> <i class="bi bi-chevron-right small"></i>
+                        </a>
+                    <?php endforeach; ?>
                 </nav>
             </aside>
 
             <main class="col-lg-9">
                 <div class="row g-4" id="contenedor-productos">
-                    <?php
-                    $where = $idCatSeleccionada ? "WHERE p.idCategoria = $idCatSeleccionada" : "";
-                    $query = "SELECT p.*, c.nombreCat FROM productos p 
-                              LEFT JOIN categoria c ON p.idCategoria = c.idCategoria 
-                              $where ORDER BY p.idProducto DESC";
-
-                    $productos = $conexion->query($query);
-
-                    if ($productos->num_rows > 0) {
-                        while ($p = $productos->fetch_object()) { ?>
+                    <?php if (!empty($productos)): ?>
+                        <?php foreach ($productos as $p): ?>
 
                             <div class="col-md-6 col-xl-4">
                                 <article class="product-card">
-                                    <button class="quick-view-btn" data-bs-toggle="modal" data-bs-target="#modal<?= $p->idProducto ?>">
+                                    <button class="quick-view-btn" data-bs-toggle="modal" data-bs-target="#modal<?= $p['idProducto'] ?>">
                                         <i class="bi bi-arrows-fullscreen"></i>
                                     </button>
 
                                     <div class="img-container">
-                                        <a href="detalle.php?id=<?= $p->idProducto ?>">
-                                            <img src="imagenes/<?= $p->imagen ?>" alt="<?= $p->nombre ?>">
+                                        <a href="detalle.php?id=<?= $p['idProducto'] ?>">
+                                            <img src="imagenes/<?= htmlspecialchars($p['imagen']) ?>" alt="<?= htmlspecialchars($p['nombre']) ?>">
                                         </a>
-                                        <button class="add-to-cart-overlay btn-agregar" data-id="<?= $p->idProducto ?>">
+                                        <button class="add-to-cart-overlay btn-agregar" data-id="<?= $p['idProducto'] ?>">
                                             AÑADIR AL CARRITO
                                         </button>
                                     </div>
 
                                     <div class="product-info">
-                                        <p class="text-uppercase fw-bold text-primary mb-1" style="font-size: 0.65rem;"><?= $p->nombreCat ?></p>
-                                        <h3 class="product-name"><?= $p->nombre ?></h3>
-                                        <p class="product-description-short"><?= $p->descripcion ?></p>
+                                        <p class="text-uppercase fw-bold text-primary mb-1" style="font-size: 0.65rem;">
+                                            <?= htmlspecialchars($p['categoria']['nombreCat']) ?>
+                                        </p>
+                                        <h3 class="product-name"><?= htmlspecialchars($p['nombre']) ?></h3>
+                                        <p class="product-description-short"><?= htmlspecialchars($p['descripcion']) ?></p>
                                         <div class="d-flex align-items-center justify-content-between">
-                                            <span class="price-tag">$<?= number_format($p->precioVenta, 2) ?></span>
-                                            <span class="text-success small fw-bold"><i class="bi bi-check-circle-fill me-1"></i>Stock</span>
+                                            <span class="price-tag">$<?= number_format((float)$p['precioVenta'], 2) ?></span>
+                                            <span class="text-success small fw-bold">
+                                                <i class="bi bi-check-circle-fill me-1"></i>
+                                                <?= $p['stock'] > 0 ? 'Stock' : 'Sin stock' ?>
+                                            </span>
                                         </div>
                                     </div>
                                 </article>
                             </div>
 
-                            <div class="modal fade" id="modal<?= $p->idProducto ?>" tabindex="-1" aria-hidden="true">
+                            <!-- Modal Quick View -->
+                            <div class="modal fade" id="modal<?= $p['idProducto'] ?>" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-lg modal-dialog-centered">
                                     <div class="modal-content border-0">
                                         <div class="modal-body p-0">
                                             <div class="row g-0">
                                                 <div class="col-md-6 bg-light p-5 d-flex align-items-center">
-                                                    <img src="imagenes/<?= $p->imagen ?>" class="img-fluid rounded shadow-sm" alt="<?= $p->nombre ?>">
+                                                    <img src="imagenes/<?= htmlspecialchars($p['imagen']) ?>" class="img-fluid rounded shadow-sm" alt="<?= htmlspecialchars($p['nombre']) ?>">
                                                 </div>
                                                 <div class="col-md-6 p-4 p-lg-5">
                                                     <button type="button" class="btn-close float-end" data-bs-dismiss="modal"></button>
-                                                    <span class="text-primary fw-bold small text-uppercase"><?= $p->nombreCat ?></span>
-                                                    <h2 class="fw-bold mt-2 mb-3"><?= $p->nombre ?></h2>
-                                                    <p class="text-muted mb-4"><?= $p->descripcion ?></p>
+                                                    <span class="text-primary fw-bold small text-uppercase">
+                                                        <?= htmlspecialchars($p['categoria']['nombreCat']) ?>
+                                                    </span>
+                                                    <h2 class="fw-bold mt-2 mb-3"><?= htmlspecialchars($p['nombre']) ?></h2>
+                                                    <p class="text-muted mb-4"><?= htmlspecialchars($p['descripcion']) ?></p>
                                                     <div class="bg-light p-3 rounded-3 mb-4">
-                                                        <span class="h3 fw-extrabold text-dark">$<?= number_format($p->precioVenta, 2) ?></span>
+                                                        <span class="h3 fw-extrabold text-dark">$<?= number_format((float)$p['precioVenta'], 2) ?></span>
                                                     </div>
                                                     <div class="d-grid">
-                                                        <button class="btn btn-dark btn-lg py-3 fw-bold rounded-3 btn-agregar" data-id="<?= $p->idProducto ?>">
+                                                        <button class="btn btn-dark btn-lg py-3 fw-bold rounded-3 btn-agregar" data-id="<?= $p['idProducto'] ?>">
                                                             <i class="bi bi-cart3 me-2"></i>Añadir al Carrito
                                                         </button>
                                                     </div>
@@ -301,23 +312,21 @@ if (!isset($_SESSION['carrito'])) {
                                 </div>
                             </div>
 
-                        <?php }
-                    } else { ?>
+                        <?php endforeach; ?>
+                    <?php else: ?>
                         <div class="col-12 text-center py-5">
                             <p class="text-muted">No se encontraron productos.</p>
                         </div>
-                    <?php } ?>
+                    <?php endif; ?>
                 </div>
             </main>
         </div>
     </div>
 
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         document.addEventListener('click', function(e) {
-            // Seleccionamos tanto el botón de la card como el del modal
             if (e.target.classList.contains('btn-agregar') || e.target.closest('.btn-agregar')) {
                 e.preventDefault();
 
@@ -325,20 +334,20 @@ if (!isset($_SESSION['carrito'])) {
                 const id = btn.getAttribute('data-id');
                 const toast = document.getElementById('cart-toast');
 
-                // Llamada AJAX al controlador
                 fetch(`controllers/carritoController.php?accion=agregar&id=${id}`)
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
-                            // Mostrar pequeña notificación
                             toast.style.display = 'block';
                             setTimeout(() => {
                                 toast.style.display = 'none';
                             }, 2500);
 
-                            // Actualizar contador del carrito si existe en el header
-                            const cartBadge = document.querySelector('.badge-carrito'); // Asegúrate de tener esta clase en tu includes/head.php
-                            if (cartBadge) cartBadge.innerText = data.cart_count;
+                            const cartBadge = document.querySelector('.badge-carrito');
+                            if (cartBadge) {
+                                cartBadge.innerText = data.cart_count;
+                                cartBadge.style.display = data.cart_count > 0 ? 'inline-block' : 'none';
+                            }
                         }
                     })
                     .catch(err => console.error("Error:", err));
