@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/menu/menu_main.xml -->
+<!-- Crea la carpeta res/menu/ si no existe -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Aparece en los 3 puntos del toolbar -->
+    <item
+        android:id="@+id/action_perfil"
+        android:title="Mi perfil"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_logout"
+        android:title="Cerrar sesión"
+        app:showAsAction="never"/>
+
+</menu>

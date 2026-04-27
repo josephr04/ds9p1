@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="#F8FAFC">
 
-    <!-- AppBar con título y filtros de categoría -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
@@ -41,7 +40,32 @@
                     android:textColor="#64748B"
                     android:layout_marginBottom="12dp"/>
 
-                <!-- Chips de categorías — equivalente al sidebar de tienda.php -->
+                <!-- Campo de búsqueda -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxStrokeColor="#E2E8F0"
+                    app:hintTextColor="#64748B"
+                    android:hint="Buscar producto...">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etBusqueda"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:imeOptions="actionSearch"
+                        android:background="@null"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Chips de categorías -->
                 <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -52,12 +76,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:singleSelection="true"/>
+
                 </HorizontalScrollView>
             </LinearLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Progress bar de carga -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -67,7 +91,6 @@
         app:layout_anchor="@id/appBar"
         app:layout_anchorGravity="bottom|center"/>
 
-    <!-- Grid de productos — equivalente al row g-4 de tienda.php -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvProductos"
         android:layout_width="match_parent"
@@ -77,7 +100,6 @@
         app:spanCount="2"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <!-- Estado vacío -->
     <TextView
         android:id="@+id/tvVacio"
         android:layout_width="wrap_content"
