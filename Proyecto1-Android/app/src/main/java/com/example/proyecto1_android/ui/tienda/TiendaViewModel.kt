@@ -1,7 +1,6 @@
 // =====================================================================
-// ui/tienda/TiendaViewModel.kt
-// Maneja el estado de la pantalla de catálogo
-// Equivalente a la lógica PHP en la parte superior de tienda.php
+// ui/tienda/TiendaViewModel.kt — con búsqueda local por nombre
+// Solo se agrega búsqueda, el resto queda igual que el original
 // =====================================================================
 package com.example.proyecto1_android.ui.tienda
 
@@ -17,34 +16,35 @@ class TiendaViewModel(
     private val carritoRepo: CarritoRepository
 ) : ViewModel() {
 
-    // Estado de carga
     private val _cargando = MutableLiveData(false)
     val cargando: LiveData<Boolean> = _cargando
 
-    // Lista de productos
+    // Lista completa sin filtrar por texto (viene de la API)
+    private val productosCargados = mutableListOf<Producto>()
+
     private val _productos = MutableLiveData<List<Producto>>()
     val productos: LiveData<List<Producto>> = _productos
 
-    // Categorías para el chip/filter bar
     private val _categorias = MutableLiveData<List<Categoria>>()
     val categorias: LiveData<List<Categoria>> = _categorias
 
-    // Categoría seleccionada (null = todas)
     private val _categoriaActual = MutableLiveData<Int?>(null)
     val categoriaActual: LiveData<Int?> = _categoriaActual
 
-    // Error para mostrar Snackbar
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    // Badge del carrito
     val cantidadCarrito = carritoRepo.cantidadTotal
+
+    // Texto de búsqueda actual
+    private var textoBusqueda: String = ""
 
     init {
         cargarCategorias()
         cargarProductos()
     }
 
+    // ── Carga desde la API y guarda la lista completa ─────────────
     fun cargarProductos(idCategoria: Int? = null) {
         viewModelScope.launch {
             _cargando.value = true
@@ -57,10 +57,30 @@ class TiendaViewModel(
             }
 
             result.fold(
-                onSuccess = { _productos.value = it },
+                onSuccess = { lista ->
+                    productosCargados.clear()
+                    productosCargados.addAll(lista)
+                    aplicarBusqueda() // aplica el texto si hay uno activo
+                },
                 onFailure = { _error.value = it.message }
             )
             _cargando.value = false
+        }
+    }
+
+    // ── Filtra localmente por nombre (instantáneo, sin API) ───────
+    fun buscar(texto: String) {
+        textoBusqueda = texto.trim().lowercase()
+        aplicarBusqueda()
+    }
+
+    private fun aplicarBusqueda() {
+        _productos.value = if (textoBusqueda.isEmpty()) {
+            productosCargados.toList()
+        } else {
+            productosCargados.filter {
+                it.nombre.lowercase().contains(textoBusqueda)
+            }
         }
     }
 
@@ -68,7 +88,7 @@ class TiendaViewModel(
         viewModelScope.launch {
             productoRepo.getCategorias().fold(
                 onSuccess = { _categorias.value = it },
-                onFailure = { /* silencioso, no crítico */ }
+                onFailure = { }
             )
         }
     }
@@ -79,7 +99,6 @@ class TiendaViewModel(
         }
     }
 
-    // Factory para instanciar el ViewModel con parámetros
     class Factory(
         private val productoRepo: ProductoRepository,
         private val carritoRepo: CarritoRepository

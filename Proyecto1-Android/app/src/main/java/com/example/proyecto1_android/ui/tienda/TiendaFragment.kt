@@ -1,6 +1,12 @@
+// =====================================================================
+// ui/tienda/TiendaFragment.kt — con barra de búsqueda agregada
+// El resto queda igual que el original
+// =====================================================================
 package com.example.proyecto1_android.ui.tienda
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -28,7 +34,6 @@ class TiendaFragment : Fragment(R.layout.fragment_tienda) {
 
     private val adapter = ProductoAdapter(
         onProductoClick = { producto ->
-            // Navegar a Detalle pasando el ID — equivalente a href="detalle.php?id=..."
             val action = TiendaFragmentDirections
                 .actionTiendaToDetalle(producto.id)
             findNavController().navigate(action)
@@ -45,51 +50,63 @@ class TiendaFragment : Fragment(R.layout.fragment_tienda) {
 
         binding.rvProductos.adapter = adapter
 
-        // Observar productos — equivalente al while(fetch_object())
+        // ── NUEVO: barra de búsqueda ──────────────────────────────
+        binding.etBusqueda.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                viewModel.buscar(s?.toString() ?: "")
+            }
+        })
+
+        // Productos
         viewModel.productos.observe(viewLifecycleOwner) { lista ->
             adapter.submitList(lista)
             binding.tvVacio.visibility = if (lista.isEmpty()) View.VISIBLE else View.GONE
         }
 
-        // Indicador de carga
+        // Loading
         viewModel.cargando.observe(viewLifecycleOwner) { cargando ->
             binding.progressBar.visibility = if (cargando) View.VISIBLE else View.GONE
         }
 
-        // Errores como Snackbar
+        // Errores
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(context, "Error: $it", Toast.LENGTH_LONG).show()
             }
         }
 
-        // Chips de categorías — equivalente al sidebar de tienda.php
+        // Chips de categorías — igual que el original
         viewModel.categorias.observe(viewLifecycleOwner) { categorias ->
             binding.chipGroupCategorias.removeAllViews()
 
-            // Chip "Todos"
             val chipTodos = Chip(requireContext()).apply {
                 text = "Todos"
                 isCheckable = true
                 isChecked = true
-                setOnClickListener { viewModel.cargarProductos(null) }
+                setOnClickListener {
+                    // Al cambiar categoría se limpia también la búsqueda
+                    binding.etBusqueda.setText("")
+                    viewModel.cargarProductos(null)
+                }
             }
             binding.chipGroupCategorias.addView(chipTodos)
 
-            // Un chip por categoría
             categorias.forEach { cat ->
                 val chip = Chip(requireContext()).apply {
                     text = cat.nombre
                     isCheckable = true
-                    setOnClickListener { viewModel.cargarProductos(cat.id) }
+                    setOnClickListener {
+                        binding.etBusqueda.setText("")
+                        viewModel.cargarProductos(cat.id)
+                    }
                 }
                 binding.chipGroupCategorias.addView(chip)
             }
         }
 
-        // Badge del carrito en el toolbar
-        viewModel.cantidadCarrito.observe(viewLifecycleOwner) { cantidad ->
-            // Actualiza el badge en el ícono del carrito
+        viewModel.cantidadCarrito.observe(viewLifecycleOwner) {
             activity?.invalidateOptionsMenu()
         }
     }
