@@ -3,7 +3,7 @@ require_once "../config/conexion.php";
 
 class Producto {
 
-    // 🔎 Buscar producto
+    // 🔎 Buscar producto por idProducto (código de barras)
     public static function buscar($codigo) {
         global $conexion;
 

@@ -39,6 +39,10 @@ if (!empty($_SESSION['carrito'])) {
                 <li class="nav-item">
                     <a class="nav-link active fw-semibold" href="index.php">Inicio</a>
                 </li>
+            <?php elseif (isset($_SESSION['empleado']) && $_SESSION['empleado']['rol'] != 1): ?>
+                <li class="nav-item">
+                    <a class="nav-link active fw-semibold" href="empleado.php">Panel empleado</a>
+                </li>
             <?php endif; ?>
 
             <li class="nav-item">

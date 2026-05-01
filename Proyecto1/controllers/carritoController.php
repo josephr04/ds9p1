@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once "../config/conexion.php";
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['carrito'])) {
@@ -16,23 +17,39 @@ if (isset($_GET['accion'])) {
     $apiBase = "http://127.0.0.1:8000/api";
 
     switch ($accion) {
-
         case 'agregar':
             if (isset($_SESSION['carrito'][$id])) {
                 $_SESSION['carrito'][$id]['cantidad'] += $extra;
+                if (empty($_SESSION['carrito'][$id]['descripcion'])) {
+                    $_SESSION['carrito'][$id]['descripcion'] = 'Sin descripción';
+                }
             } else {
                 $json = @file_get_contents("$apiBase/productos/$id");
                 $prod = $json ? json_decode($json, true) : null;
 
                 if ($prod && !isset($prod['error'])) {
-                    $_SESSION['carrito'][$id] = [
-                        'nombre'   => $prod['nombre'],
-                        'precio'   => (float)$prod['precioVenta'],
-                        'imagen'   => $prod['imagen'],
-                        'cantidad' => $extra
-                    ];
+                    $descripcion = $prod['descripcion'] ?? null;
+                    $imagen = $prod['imagen'] ?? '';
+                    $nombre = $prod['nombre'] ?? '';
+                    $precioVenta = isset($prod['precioVenta']) ? (float)$prod['precioVenta'] : 0;
+                } else {
+                    $stmt = $conexion->prepare("SELECT nombre, precioVenta, imagen, descripcion FROM productos WHERE idProducto = ?");
+                    $stmt->bind_param('s', $id);
+                    $stmt->execute();
+                    $stmt->bind_result($nombre, $precioVenta, $imagen, $descripcion);
+                    $stmt->fetch();
+                    $stmt->close();
                 }
+
+                $_SESSION['carrito'][$id] = [
+                    'nombre'      => $nombre,
+                    'precio'      => $precioVenta,
+                    'imagen'      => $imagen,
+                    'descripcion' => $descripcion ?? 'Sin descripción',
+                    'cantidad'    => $extra
+                ];
             }
+            
             break;
 
         case 'sumar':

@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 if (isset($_SESSION['empleado'])) {
-    header($_SESSION['empleado']['rol'] == 1 ? 'Location: index.php' : 'Location: store.php');
+    header($_SESSION['empleado']['rol'] == 1 ? 'Location: index.php' : 'Location: empleado.php');
     exit;
 }
 
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($data && ($data['status'] ?? '') === 'success') {
             $_SESSION['empleado'] = $data;
-            header($data['rol'] == 1 ? 'Location: index.php' : 'Location: store.php');
+            header($data['rol'] == 1 ? 'Location: index.php' : 'Location: empleado.php');
             exit;
         } else {
             $error = 'Usuario o contraseña incorrectos.';
