@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- res/menu/bottom_nav_admin.xml — REEMPLAZA el tuyo -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/adminProductosFragment"
         android:icon="@android:drawable/ic_menu_manage"
         android:title="Productos"/>
+
+    <item
+        android:id="@+id/adminCategoriasFragment"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Categorías"/>
+
+    <item
+        android:id="@+id/adminMarcasFragment"
+        android:icon="@android:drawable/ic_menu_gallery"
+        android:title="Marcas"/>
+
+    <item
+        android:id="@+id/adminEmpleadosFragment"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Empleados"/>
 
 </menu>

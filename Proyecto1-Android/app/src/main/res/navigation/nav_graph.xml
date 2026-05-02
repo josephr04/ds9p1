@@ -10,8 +10,6 @@
         android:name="com.example.proyecto1_android.ui.tienda.TiendaFragment"
         android:label="Tienda"
         tools:layout="@layout/fragment_tienda">
-
-        <!-- Acción: Tienda → Detalle (pasa el ID del producto) -->
         <action
             android:id="@+id/action_tienda_to_detalle"
             app:destination="@id/detalleFragment" />
@@ -22,8 +20,6 @@
         android:name="com.example.proyecto1_android.ui.detalle.DetalleFragment"
         android:label="Detalle"
         tools:layout="@layout/fragment_detalle">
-
-        <!-- Argumento — equivalente a $_GET['id'] en detalle.php -->
         <argument
             android:name="idProducto"
             app:argType="long" />
@@ -33,6 +29,40 @@
         android:id="@+id/carritoFragment"
         android:name="com.example.proyecto1_android.ui.carrito.CarritoFragment"
         android:label="Carrito"
-        tools:layout="@layout/fragment_carrito" />
+        tools:layout="@layout/fragment_carrito">
+
+        <!-- ✅ Acción DENTRO del fragment de carrito -->
+        <action
+            android:id="@+id/action_carritoFragment_to_checkoutFragment"
+            app:destination="@id/checkoutFragment" />
+    </fragment>
+
+    <!-- ✅ Agregar el fragment de checkout -->
+    <fragment
+        android:id="@+id/checkoutFragment"
+        android:name="com.example.proyecto1_android.ui.checkout.CheckoutFragment"
+        android:label="Checkout"
+        tools:layout="@layout/fragment_checkout">
+
+        <action
+            android:id="@+id/action_checkout_to_pagoExitoso"
+            app:destination="@id/pagoExitosoFragment"
+            app:popUpTo="@id/carritoFragment"
+            app:popUpToInclusive="true"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/pagoExitosoFragment"
+        android:name="com.example.proyecto1_android.ui.checkout.PagoExitosoFragment"
+        android:label="Pago Exitoso"
+        tools:layout="@layout/fragment_pago_exitoso">
+
+        <argument android:name="idFactura"  app:argType="long"/>
+        <argument android:name="subtotal"   app:argType="float"/>
+        <argument android:name="itbms"      app:argType="float"/>
+        <argument android:name="total"      app:argType="float"/>
+        <argument android:name="items"
+            app:argType="com.example.proyecto1_android.model.CarritoItem[]"/>
+    </fragment>
 
 </navigation>

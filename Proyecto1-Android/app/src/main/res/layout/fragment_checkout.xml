@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8FAFC">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Checkout"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#0F172A"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- ── Datos de la tarjeta ── -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Datos de la tarjeta"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#0F172A"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- Tipo de tarjeta -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tipo de tarjeta"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#334155"
+                    android:layout_marginBottom="4dp"/>
+
+                <Spinner
+                    android:id="@+id/spinnerTipoTarjeta"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/spinner_border"
+                    android:layout_marginBottom="12dp"
+                    android:paddingHorizontal="12dp"/>
+
+                <!-- Número de tarjeta -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Número de tarjeta"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#334155"
+                    android:layout_marginBottom="4dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginBottom="12dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etNumeroTarjeta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="xxxx xxxx xxxx xxxx"
+                        android:inputType="phone"
+                        android:maxLength="19"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Fecha vencimiento + CVV en fila -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Fecha de vencimiento"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#334155"
+                            android:layout_marginBottom="4dp"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etFechaVence"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="MM/AA"
+                                android:inputType="phone"
+                                android:maxLength="5"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Código CVV"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#334155"
+                            android:layout_marginBottom="4dp"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etCvv"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="123"
+                                android:inputType="numberPassword"
+                                android:maxLength="4"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Monto a pagar (readonly) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Monto a pagar"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#334155"
+                    android:layout_marginBottom="4dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginBottom="16dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etMontoAPagar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:editable="false"
+                        android:background="@null"
+                        android:textColor="#64748B"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Info saldo tarjeta seleccionada -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardInfoTarjeta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="8dp"
+                    app:cardBackgroundColor="#F1F5F9"
+                    app:cardElevation="0dp"
+                    android:visibility="gone"
+                    android:layout_marginBottom="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView android:id="@+id/tvSaldoTarjeta"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="13sp"
+                            android:textColor="#475569"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Botón pagar -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPagar"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="Pagar ahora"
+                    android:textSize="16sp"
+                    app:backgroundTint="#DC2626"
+                    app:cornerRadius="8dp"
+                    android:layout_marginTop="8dp"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Resumen del pedido ── -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Resumen de tu orden"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#0F172A"
+                    android:layout_marginBottom="12dp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvResumen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E2E8F0"
+                    android:layout_marginVertical="12dp"/>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginBottom="4dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="Subtotal" android:textColor="#475569"/>
+                    <TextView android:id="@+id/tvSubtotal" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:textColor="#0F172A"/>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="ITBMS (7%)" android:textColor="#475569"/>
+                    <TextView android:id="@+id/tvItbms" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:textColor="#0F172A"/>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="#E2E8F0" android:layout_marginBottom="8dp"/>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="Total a pagar"
+                        android:textStyle="bold" android:textColor="#0F172A" android:textSize="16sp"/>
+                    <TextView android:id="@+id/tvTotal" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:textStyle="bold"
+                        android:textColor="#4F46E5" android:textSize="16sp"/>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Se verificará la tarjeta contra la base de datos y se descontará el saldo si es válida. Asegúrate de que la tarjeta tenga suficiente saldo."
+                    android:textSize="12sp"
+                    android:textColor="#94A3B8"
+                    android:layout_marginTop="12dp"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <ProgressBar
+            android:id="@+id/progressCheckout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Volver al carrito -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVolver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volver al carrito"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:strokeColor="#CBD5E1"/>
+
+    </LinearLayout>
+</ScrollView>

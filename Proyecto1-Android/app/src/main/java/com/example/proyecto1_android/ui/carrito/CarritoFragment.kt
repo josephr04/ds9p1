@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.proyecto1_android.R
 import com.example.proyecto1_android.data.db.AppDatabase
 import com.example.proyecto1_android.data.repository.CarritoRepository
@@ -57,10 +58,7 @@ class CarritoFragment : Fragment(R.layout.fragment_carrito) {
 
         // Proceder al pago (por ahora solo muestra mensaje)
         binding.btnProceder.setOnClickListener {
-            // TODO: navegar a checkout cuando lo implementes
-            android.widget.Toast.makeText(
-                context, "Checkout próximamente", android.widget.Toast.LENGTH_SHORT
-            ).show()
+            findNavController().navigate(R.id.action_carritoFragment_to_checkoutFragment)
         }
     }
 

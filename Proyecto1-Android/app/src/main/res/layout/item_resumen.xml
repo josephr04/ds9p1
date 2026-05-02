@@ -1,0 +1,19 @@
+<!-- res/layout/item_resumen.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="6dp">
+
+    <TextView android:id="@+id/tvNombreResumen"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_weight="1" android:textColor="#334155"/>
+
+    <TextView android:id="@+id/tvCantidadResumen"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textColor="#64748B" android:layout_marginHorizontal="8dp"/>
+
+    <TextView android:id="@+id/tvSubtotalResumen"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textStyle="bold" android:textColor="#0F172A"/>
+</LinearLayout>

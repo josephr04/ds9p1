@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/layout/item_admin_empleado.xml -->
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="14dp">
+
+        <!-- Avatar con inicial -->
+        <TextView
+            android:id="@+id/tvInicialEmpleado"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/bg_login_gradient"
+            android:layout_marginEnd="12dp"/>
+
+        <!-- Info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvNombreEmpleado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#0F172A"/>
+
+            <TextView
+                android:id="@+id/tvUsuarioEmpleado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="#64748B"
+                android:layout_marginTop="2dp"/>
+
+            <!-- Badge de rol -->
+            <TextView
+                android:id="@+id/tvRolEmpleado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_pill_active"/>
+        </LinearLayout>
+
+        <!-- Botones -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditarEmpleado"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Editar"
+                android:textSize="12sp"
+                android:layout_marginBottom="6dp"
+                app:strokeColor="#4F46E5"
+                app:cornerRadius="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEliminarEmpleado"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Eliminar"
+                android:textSize="12sp"
+                android:backgroundTint="#FEF2F2"
+                android:textColor="#DC2626"
+                app:cornerRadius="8dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

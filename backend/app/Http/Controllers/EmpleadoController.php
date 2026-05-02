@@ -1,11 +1,16 @@
 <?php
 namespace App\Http\Controllers;
+
 use App\Models\Empleado;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class EmpleadoController extends Controller
 {
+    private function hashear(string $contrasena): string
+    {
+        return substr(md5($contrasena), 0, 25);
+    }
+
     public function index()
     {
         return response()->json(Empleado::all());
@@ -30,11 +35,14 @@ class EmpleadoController extends Controller
             'contrasena' => 'required|string|min:6',
         ]);
 
-        $data = $request->all();
-        // Hashear contraseña si quieres seguridad
-        // $data['contrasena'] = Hash::make($request->contrasena);
+        $empleado = Empleado::create([
+            'usuario'    => $request->usuario,
+            'nombre'     => $request->nombre,
+            'apellido'   => $request->apellido,
+            'rol'        => $request->rol,
+            'contrasena' => $this->hashear($request->contrasena),
+        ]);
 
-        $empleado = Empleado::create($data);
         return response()->json($empleado, 201);
     }
 
@@ -44,7 +52,14 @@ class EmpleadoController extends Controller
         if (!$empleado) {
             return response()->json(['mensaje' => 'Empleado no encontrado'], 404);
         }
-        $empleado->update($request->all());
+
+        $data = $request->only(['usuario', 'nombre', 'apellido', 'rol']);
+
+        if ($request->filled('contrasena')) {
+            $data['contrasena'] = $this->hashear($request->contrasena);
+        }
+
+        $empleado->update($data);
         return response()->json($empleado);
     }
 
@@ -67,15 +82,16 @@ class EmpleadoController extends Controller
 
         $empleado = Empleado::where('usuario', $request->usuario)->first();
 
-        if (!$empleado || $request->contrasena !== $empleado->contrasena) {
+        if (!$empleado || $this->hashear($request->contrasena) !== $empleado->contrasena) {
             return response()->json(['mensaje' => 'Credenciales incorrectas'], 401);
         }
 
         return response()->json([
-            'status'  => 'success',
-            'usuario' => $empleado->usuario,
-            'nombre'  => $empleado->nombre,
-            'rol'     => $empleado->rol,   // 1 = admin, 2 = empleado
+            'status'   => 'success',
+            'usuario'  => $empleado->usuario,
+            'nombre'   => $empleado->nombre,
+            'apellido' => $empleado->apellido,
+            'rol'      => $empleado->rol,
         ]);
     }
 }

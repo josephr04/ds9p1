@@ -30,6 +30,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+        supportActionBar?.title = when (sessionManager.getRol()) {
+            1    -> "Admin"
+            else -> "Empleado"
+        }
 
         // ── Tu navegación original, sin cambios ──────────────────
         val navHost = supportFragmentManager
@@ -59,18 +63,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mostrarPerfil() {
-        val rolTexto = when (sessionManager.getRol()) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_perfil, null)
+
+        val nombre   = sessionManager.getNombre() ?: "?"
+        val apellido = sessionManager.getApellido() ?: "?"
+        val usuario  = sessionManager.getUsuario() ?: "?"
+        val rol      = when (sessionManager.getRol()) {
             1    -> "Administrador"
-            2    -> "Cliente"
+            2    -> "Empleado"
             else -> "Rol ${sessionManager.getRol()}"
         }
+
+        // Avatar muestra inicial del nombre
+        dialogView.findViewById<android.widget.TextView>(R.id.tvInicial).text =
+            nombre.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
+
+        // Nombre completo arriba
+        dialogView.findViewById<android.widget.TextView>(R.id.tvNombrePerfil).text =
+            "$nombre $apellido"
+
+        dialogView.findViewById<android.widget.TextView>(R.id.tvRolBadge).text       = rol
+        dialogView.findViewById<android.widget.TextView>(R.id.tvUsuarioPerfil).text   = usuario
+        dialogView.findViewById<android.widget.TextView>(R.id.tvNombreCompletoPerfil).text = nombre
+        dialogView.findViewById<android.widget.TextView>(R.id.tvApellidoPerfil).text  = apellido
+
         AlertDialog.Builder(this)
-            .setTitle("Mi perfil")
-            .setMessage(
-                "Usuario: ${sessionManager.getUsuario()}\n" +
-                        "Nombre:  ${sessionManager.getNombre()}\n" +
-                        "Rol:     $rolTexto"
-            )
+            .setView(dialogView)
             .setPositiveButton("Cerrar", null)
             .show()
     }

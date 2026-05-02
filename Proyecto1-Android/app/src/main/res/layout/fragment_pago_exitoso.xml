@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <!-- Ícono check verde -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="40dp"
+            app:cardBackgroundColor="#D1FAE5"
+            app:cardElevation="0dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="20dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/checkbox_on_background"
+                app:tint="#059669"/>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Título -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¡Pago aprobado!"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#0F172A"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Subtítulo -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tu pedido ha sido procesado correctamente.\nGracias por tu compra."
+            android:textSize="14sp"
+            android:textColor="#64748B"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Banner verde -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="#D1FAE5"
+            app:cardElevation="0dp"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="14dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    app:tint="#059669"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pago aprobado exitosamente."
+                    android:textColor="#065F46"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Card factura -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Número de factura -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@android:drawable/ic_menu_agenda"
+                        app:tint="#475569"
+                        android:layout_marginEnd="6dp"/>
+
+                    <TextView
+                        android:id="@+id/tvNumeroFactura"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Factura #—"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#0F172A"/>
+                </LinearLayout>
+
+                <!-- Lista de productos -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvProductosFactura"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#059669"
+                    android:layout_marginVertical="12dp"/>
+
+                <!-- Subtotal -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginBottom="4dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="Subtotal:" android:textColor="#334155"/>
+                    <TextView android:id="@+id/tvSubtotalExito"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:textColor="#0F172A" android:textStyle="bold"/>
+                </LinearLayout>
+
+                <!-- ITBMS -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="ITBMS (7%):" android:textColor="#334155"/>
+                    <TextView android:id="@+id/tvItbmsExito"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:textColor="#0F172A" android:textStyle="bold"/>
+                </LinearLayout>
+
+                <!-- Total -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginBottom="12dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="Total:"
+                        android:textColor="#059669" android:textStyle="bold" android:textSize="16sp"/>
+                    <TextView android:id="@+id/tvTotalExito"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:textColor="#059669" android:textStyle="bold" android:textSize="16sp"/>
+                </LinearLayout>
+
+                <!-- Footer -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@android:drawable/ic_menu_my_calendar"
+                        app:tint="#94A3B8"
+                        android:layout_marginEnd="4dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Factura generada correctamente."
+                        android:textSize="12sp"
+                        android:textColor="#94A3B8"/>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Botón volver a la tienda -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVolverTienda"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Volver a la tienda"
+            android:textSize="16sp"
+            app:backgroundTint="#4F46E5"
+            app:cornerRadius="12dp"/>
+
+    </LinearLayout>
+</ScrollView>

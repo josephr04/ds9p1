@@ -56,13 +56,19 @@ class LoginActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val body = response.body()
                     if (body != null && body.status == "success") {
-                        sessionManager.saveSession(body.usuario, body.nombre, body.rol)
+                        sessionManager.saveSession(body.usuario, body.nombre, body.apellido, body.rol)
                         goByRole()
                     } else {
                         mostrarError("Usuario o contraseña incorrectos")
                     }
                 } else {
-                    mostrarError("Error del servidor (${response.code()})")
+                    // ✅ Antes: mostraba "Error del servidor (401)"
+                    // ✅ Ahora: distingue 401 de otros errores
+                    if (response.code() == 401) {
+                        mostrarError("Usuario o contraseña incorrectos")
+                    } else {
+                        mostrarError("Error del servidor (${response.code()})")
+                    }
                 }
             } catch (e: java.net.ConnectException) {
                 mostrarError("No se pudo conectar al servidor")

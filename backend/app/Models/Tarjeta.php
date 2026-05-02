@@ -18,7 +18,7 @@ class Tarjeta extends Model
     ];
 
     protected $hidden = [
-        'codSeguridad'
+        // 'codSeguridad'
     ];
 
     public function facturas()

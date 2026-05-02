@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/layout/fragment_admin_empleados.xml -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8FAFC">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        app:elevation="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Empleados"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#0F172A"/>
+
+            <ProgressBar
+                android:id="@+id/progressBarEmpleados"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:visibility="gone"/>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <TextView
+        android:id="@+id/tvVacioEmpleados"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="No hay empleados registrados"
+        android:textColor="#94A3B8"
+        android:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvEmpleados"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="12dp"
+        android:clipToPadding="false"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAgregarEmpleado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:contentDescription="Agregar empleado"
+        app:srcCompat="@drawable/ic_add"
+        app:backgroundTint="#7C6FD4"
+        app:tint="#FFFFFF"
+        />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

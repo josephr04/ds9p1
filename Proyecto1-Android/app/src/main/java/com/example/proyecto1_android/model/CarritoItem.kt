@@ -7,7 +7,10 @@ package com.example.proyecto1_android.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @Entity(tableName = "carrito")
 data class CarritoItem(
     @PrimaryKey
@@ -16,10 +19,8 @@ data class CarritoItem(
     val imagen: String,
     val precioVenta: Double,
     var cantidad: Int = 1
-) {
-    // Subtotal de esta fila — equivalente a $item['precio'] * $item['cantidad']
+) : Parcelable {
     fun subtotal(): Double = precioVenta * cantidad
-
-    // URL de imagen
     fun imageUrl(): String = "file:///android_asset/$imagen"
 }
+

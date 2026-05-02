@@ -41,6 +41,7 @@ data class LoginResponse(
     val status: String,
     val usuario: String,
     val nombre: String,
+    val apellido: String,
     val rol: Int
 )
 
@@ -55,4 +56,59 @@ data class ProductoRequest(
     @SerializedName("stock")       val stock: Int,
     @SerializedName("idCategoria") val idCategoria: Int,
     @SerializedName("idMarca")     val idMarca: Int
+)
+
+data class CategoriaRequest(
+    @SerializedName("nombreCat") val nombreCat: String
+)
+
+data class MarcaRequest(
+    @SerializedName("nombreMarc") val nombreMarc: String
+)
+
+data class Empleado(
+    @SerializedName("idEmpleado") val id: Int,
+    @SerializedName("usuario")    val usuario: String,
+    @SerializedName("nombre")     val nombre: String,
+    @SerializedName("apellido")   val apellido: String,
+    @SerializedName("rol")        val rol: Int  // 1 = admin, 2 = empleado
+)
+
+data class EmpleadoRequest(
+    @SerializedName("usuario")    val usuario: String,
+    @SerializedName("nombre")     val nombre: String,
+    @SerializedName("apellido")   val apellido: String,
+    @SerializedName("rol")        val rol: Int,
+    @SerializedName("contrasena") val contrasena: String
+)
+
+// model/Tarjeta.kt
+data class Tarjeta(
+    val idTarjeta: Long,
+    val tipo: String,          // "debito" | "credito"
+    val digitos: String,       // "4532123456789012"
+    val fechaVence: String,    // "12/27"
+    val saldo: Double,
+    val saldoMaximo: Double?,   // solo crédito, null en débito
+    val codSeguridad: String
+)
+
+// model/FacturaRequest.kt
+data class FacturaRequest(
+    val idTarjeta: Long,
+    val detalles: List<DetalleRequest>
+)
+
+data class DetalleRequest(
+    val idProducto: Long,
+    val cantidad: Int,
+    val precio_unitario: Double
+)
+
+// model/FacturaResponse.kt
+data class FacturaResponse(
+    val idFactura: Long,
+    val subtotal: Double,
+    val itbms: Double,
+    val total: Double
 )

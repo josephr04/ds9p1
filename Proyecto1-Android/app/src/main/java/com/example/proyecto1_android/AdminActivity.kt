@@ -1,8 +1,3 @@
-// =====================================================================
-// AdminActivity.kt
-// Pantalla principal del administrador — igual estructura que MainActivity
-// Tiene su propio BottomNav con: Productos | (puedes agregar más)
-// =====================================================================
 package com.example.proyecto1_android
 
 import android.content.Intent
@@ -35,7 +30,7 @@ class AdminActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "Admin · ${sessionManager.getNombre()}"
+        supportActionBar?.title = "Admin"
 
         val navHost = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_admin) as NavHostFragment
@@ -51,11 +46,7 @@ class AdminActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_perfil -> {
-                AlertDialog.Builder(this)
-                    .setTitle("Mi perfil")
-                    .setMessage("Usuario: ${sessionManager.getUsuario()}\nNombre: ${sessionManager.getNombre()}\nRol: Administrador")
-                    .setPositiveButton("Cerrar", null)
-                    .show()
+                mostrarPerfil()
                 true
             }
             R.id.action_logout -> {
@@ -72,6 +63,31 @@ class AdminActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun mostrarPerfil() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_perfil, null)
+
+        val nombre   = sessionManager.getNombre()
+        val apellido = sessionManager.getApellido()
+        val usuario  = sessionManager.getUsuario()
+        val rol      = "Administrador"
+
+        dialogView.findViewById<android.widget.TextView>(R.id.tvInicial).text =
+            nombre.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
+
+        dialogView.findViewById<android.widget.TextView>(R.id.tvNombrePerfil).text =
+            "$nombre $apellido"
+
+        dialogView.findViewById<android.widget.TextView>(R.id.tvRolBadge).text       = rol
+        dialogView.findViewById<android.widget.TextView>(R.id.tvUsuarioPerfil).text   = usuario
+        dialogView.findViewById<android.widget.TextView>(R.id.tvNombreCompletoPerfil).text = nombre
+        dialogView.findViewById<android.widget.TextView>(R.id.tvApellidoPerfil).text  = apellido
+
+        AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setPositiveButton("Cerrar", null)
+            .show()
     }
 
     private fun goToLogin() {

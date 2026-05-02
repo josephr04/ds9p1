@@ -25,26 +25,62 @@ class FacturaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'idTarjeta'          => 'required|exists:tarjeta,idTarjeta',
-            'detalles'           => 'required|array|min:1',
+            'idTarjeta'                  => 'required|exists:tarjeta,idTarjeta',
+            'detalles'                   => 'required|array|min:1',
             'detalles.*.idProducto'      => 'required|exists:productos,idProducto',
             'detalles.*.cantidad'        => 'required|integer|min:1',
-            'detalles.*.precio_unitario' => 'required|numeric'
+            'detalles.*.precio_unitario' => 'required|numeric',
         ]);
 
         DB::beginTransaction();
         try {
-            $subtotal = collect($request->detalles)->sum(function ($item) {
-                return $item['cantidad'] * $item['precio_unitario'];
-            });
-            $itbms = $subtotal * 0.07;
-            $total = $subtotal + $itbms;
+            $subtotal = collect($request->detalles)->sum(fn($i) => $i['cantidad'] * $i['precio_unitario']);
+            $itbms    = round($subtotal * 0.07, 2);
+            $total    = $subtotal + $itbms;
+
+            $tarjeta = Tarjeta::lockForUpdate()->find($request->idTarjeta);
+
+            // ✅ str_contains es tolerante a tildes y mayúsculas
+            $tipo = strtolower($tarjeta->tipo); // "débito" o "crédito"
+
+            if (str_contains($tipo, 'debito') || str_contains($tipo, 'débito')) {
+                if ($tarjeta->saldo < $total) {
+                    DB::rollBack();
+                    return response()->json([
+                        'mensaje'          => 'Saldo insuficiente en la tarjeta de débito.',
+                        'saldo_disponible' => $tarjeta->saldo,
+                        'total_requerido'  => $total,
+                    ], 422);
+                }
+                $tarjeta->saldo -= $total;
+                $tarjeta->save();
+
+            } elseif (str_contains($tipo, 'credito') || str_contains($tipo, 'crédito')) {
+                $disponible = $tarjeta->saldoMaximo - $tarjeta->saldo;
+                if ($disponible < $total) {
+                    DB::rollBack();
+                    return response()->json([
+                        'mensaje'            => 'Límite de crédito insuficiente.',
+                        'credito_disponible' => $disponible,
+                        'total_requerido'    => $total,
+                    ], 422);
+                }
+                $tarjeta->saldo += $total;
+                $tarjeta->save();
+
+            } else {
+                // Tipo desconocido — loguear para debug
+                DB::rollBack();
+                return response()->json([
+                    'mensaje' => 'Tipo de tarjeta no reconocido: ' . $tarjeta->tipo
+                ], 422);
+            }
 
             $factura = Factura::create([
                 'idTarjeta' => $request->idTarjeta,
                 'subtotal'  => $subtotal,
                 'itbms'     => $itbms,
-                'total'     => $total
+                'total'     => $total,
             ]);
 
             foreach ($request->detalles as $detalle) {
@@ -52,7 +88,7 @@ class FacturaController extends Controller
                     'idFactura'       => $factura->idFactura,
                     'idProducto'      => $detalle['idProducto'],
                     'cantidad'        => $detalle['cantidad'],
-                    'precio_unitario' => $detalle['precio_unitario']
+                    'precio_unitario' => $detalle['precio_unitario'],
                 ]);
             }
 
@@ -61,7 +97,7 @@ class FacturaController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['mensaje' => 'Error al crear la factura', 'error' => $e->getMessage()], 500);
+            return response()->json(['mensaje' => 'Error interno', 'error' => $e->getMessage()], 500);
         }
     }
 }

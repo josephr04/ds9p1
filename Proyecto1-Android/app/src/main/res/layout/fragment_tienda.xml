@@ -27,7 +27,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="High Fidelity"
+                    android:text="SellFlow"
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:textColor="#0F172A"/>

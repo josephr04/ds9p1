@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- res/navigation/nav_graph_admin.xml -->
-<!-- Crea este archivo en res/navigation/ (misma carpeta que tu nav_graph.xml actual) -->
+<!-- res/navigation/nav_graph_admin.xml — REEMPLAZA el tuyo -->
 <navigation
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,31 +7,43 @@
     android:id="@+id/nav_graph_admin"
     app:startDestination="@id/adminProductosFragment">
 
-    <!-- Lista de productos -->
     <fragment
         android:id="@+id/adminProductosFragment"
         android:name="com.example.proyecto1_android.ui.admin.AdminProductosFragment"
         android:label="Productos"
         tools:layout="@layout/fragment_admin_productos">
-
-        <!-- Navegación al formulario (crear o editar) -->
         <action
             android:id="@+id/action_adminProductos_to_adminFormulario"
             app:destination="@id/adminFormularioFragment"/>
     </fragment>
 
-    <!-- Formulario crear/editar -->
     <fragment
         android:id="@+id/adminFormularioFragment"
         android:name="com.example.proyecto1_android.ui.admin.AdminFormularioFragment"
         android:label="Producto"
         tools:layout="@layout/fragment_admin_formulario">
-
-        <!-- Argumento: productoId = -1 para crear, id real para editar -->
         <argument
             android:name="productoId"
             app:argType="long"
             android:defaultValue="-1L"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/adminCategoriasFragment"
+        android:name="com.example.proyecto1_android.ui.admin.AdminCategoriasFragment"
+        android:label="Categorías"
+        tools:layout="@layout/fragment_admin_lista_simple"/>
+
+    <fragment
+        android:id="@+id/adminMarcasFragment"
+        android:name="com.example.proyecto1_android.ui.admin.AdminMarcasFragment"
+        android:label="Marcas"
+        tools:layout="@layout/fragment_admin_lista_simple"/>
+
+    <fragment
+        android:id="@+id/adminEmpleadosFragment"
+        android:name="com.example.proyecto1_android.ui.admin.AdminEmpleadosFragment"
+        android:label="Empleados"
+        tools:layout="@layout/fragment_admin_empleados"/>
 
 </navigation>

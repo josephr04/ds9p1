@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Avatar con inicial -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="center_horizontal"
+        app:cardCornerRadius="36dp"
+        app:cardBackgroundColor="#4F46E5"
+        app:cardElevation="0dp"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:id="@+id/tvInicial"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Nombre completo arriba (nombre + apellido) -->
+    <TextView
+        android:id="@+id/tvNombrePerfil"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#0F172A"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Rol badge -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        app:cardCornerRadius="12dp"
+        app:cardBackgroundColor="#EEF2FF"
+        app:cardElevation="0dp"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/tvRolBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:textSize="12sp"
+            android:textColor="#4F46E5"
+            android:textStyle="bold"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E2E8F0"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Usuario -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            app:cardCornerRadius="18dp"
+            app:cardBackgroundColor="#F1F5F9"
+            app:cardElevation="0dp"
+            android:layout_marginEnd="12dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:tint="#64748B"/>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Usuario"
+                android:textSize="11sp"
+                android:textColor="#94A3B8"/>
+
+            <TextView
+                android:id="@+id/tvUsuarioPerfil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#0F172A"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Nombre -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            app:cardCornerRadius="18dp"
+            app:cardBackgroundColor="#F1F5F9"
+            app:cardElevation="0dp"
+            android:layout_marginEnd="12dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:tint="#64748B"/>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre"
+                android:textSize="11sp"
+                android:textColor="#94A3B8"/>
+
+            <TextView
+                android:id="@+id/tvNombreCompletoPerfil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#0F172A"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Apellido -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            app:cardCornerRadius="18dp"
+            app:cardBackgroundColor="#F1F5F9"
+            app:cardElevation="0dp"
+            android:layout_marginEnd="12dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:tint="#64748B"/>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Apellido"
+                android:textSize="11sp"
+                android:textColor="#94A3B8"/>
+
+            <TextView
+                android:id="@+id/tvApellidoPerfil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#0F172A"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
