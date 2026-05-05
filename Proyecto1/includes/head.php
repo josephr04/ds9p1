@@ -1,3 +1,4 @@
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -119,7 +120,7 @@ if (!empty($_SESSION['carrito'])) {
                             <?php endif; ?>
 
                             <li>
-                                <a class="dropdown-item" href="perfil.php">
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalPerfil">
                                     <i class="bi bi-person me-2"></i>Mi perfil
                                 </a>
                             </li>

@@ -171,7 +171,7 @@ include "includes/head.php";
     </div>
 
     <div class="container mb-5">
-        <nav aria-label="breadcrumb" class="mb-4">
+        <nav aria-label="breadcrumb" class="mb-4 mt-4">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="store.php">Tienda</a></li>
                 <li class="breadcrumb-item">
@@ -299,9 +299,7 @@ include "includes/head.php";
         </div>
     </section>
 
-    <footer class="py-5 bg-white border-top text-center mt-5">
-        <p class="text-muted small mb-0">&copy; 2026 SellFlow High-Fidelity. All Rights Reserved.</p>
-    </footer>
+    <?php include 'includes/footer.php'; ?>
 
     <script>
         function updateQty(val) {

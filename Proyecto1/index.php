@@ -1649,7 +1649,7 @@ unset($_SESSION['res_operacion'], $_SESSION['res_motivo']);
                 });
             }
         </script>
-
+    <?php include 'includes/footer.php'; ?>
 </body>
 
 </html>
