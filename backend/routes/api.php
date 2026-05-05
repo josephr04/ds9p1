@@ -11,9 +11,15 @@ use App\Http\Controllers\FacturaDetalleController;
 // ─── PÚBLICOS ────────────────────────────────────────────
 Route::get('/categorias', [CategoriaController::class, 'index']);
 Route::get('/categorias/{id}', [CategoriaController::class, 'show']);
+Route::post('/categorias', [CategoriaController::class, 'store']);
+Route::put('/categorias/{id}', [CategoriaController::class, 'update']);
+Route::delete('/categorias/{id}', [CategoriaController::class, 'destroy']);
 
 Route::get('/marcas', [MarcaController::class, 'index']);
 Route::get('/marcas/{id}', [MarcaController::class, 'show']);
+Route::post('/marcas', [MarcaController::class, 'store']);
+Route::put('/marcas/{id}', [MarcaController::class, 'update']);
+Route::delete('/marcas/{id}', [MarcaController::class, 'destroy']);
 
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::get('/productos/{id}', [ProductoController::class, 'show']);
@@ -21,8 +27,6 @@ Route::get('/productos/{id}', [ProductoController::class, 'show']);
 Route::post('login', [EmpleadoController::class, 'login']);
 
 // ─── PROTEGIDOS ──────────────────────────────────────────
-Route::apiResource('categorias', CategoriaController::class)->except(['index', 'show']);
-Route::apiResource('marcas',     MarcaController::class)->except(['index', 'show']);
 Route::apiResource('productos',  ProductoController::class)->except(['index', 'show']);
 
 Route::apiResource('empleados', EmpleadoController::class);

@@ -1,20 +1,30 @@
 <?php
 session_start();
-include "includes/head.php";
 
-// 1. Validar el ID del producto desde la URL
-if (!isset($_GET['id']) || empty($_GET['id'])) {
+// ══════════════════════════════════════════════════════
+// TODA la lógica de redirect va ANTES del include head.php
+// porque head.php ya imprime HTML y eso bloquea header()
+// ══════════════════════════════════════════════════════
+
+// ── Si llega ?id=X, guardarlo en sesión y redirigir limpio (PRG)
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $_SESSION['producto_id'] = (int)$_GET['id'];
+    header("Location: " . strtok($_SERVER['REQUEST_URI'], '?'));
+    exit;
+}
+
+// ── Si no hay ID en sesión, volver a la tienda
+if (empty($_SESSION['producto_id'])) {
     header("Location: store.php");
     exit;
 }
 
-$idProducto = (int)$_GET['id'];
+$idProducto = (int)$_SESSION['producto_id'];
 
-// 2. Consultar el producto desde la API
+// ── Consultar el producto desde la API
 $apiBase  = "http://127.0.0.1:8000/api";
 $response = @file_get_contents("$apiBase/productos/$idProducto");
 
-// Si el producto no existe o la API falla, redirigir a la tienda
 if (!$response) {
     header("Location: store.php");
     exit;
@@ -26,6 +36,9 @@ if (empty($p) || isset($p['error'])) {
     header("Location: store.php");
     exit;
 }
+
+// ── Recién aquí, cuando ya no hay ningún redirect posible, incluimos head.php
+include "includes/head.php";
 ?>
 
 <!DOCTYPE html>
@@ -200,13 +213,14 @@ if (empty($p) || isset($p['error'])) {
                     <?php
                         $stock = (int)$p['stock'];
                         if ($stock > 0): ?>
-                        <div class="stock-info text-success mb-4">
-                            <i class="bi bi-check2-circle me-1"></i>
-                            En stock (<?= $stock ?> disponibles) - Disponible para entrega inmediata
+                        <div class="alert alert-success py-3 mb-4" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <strong>En stock:</strong> <?= $stock ?> unidad<?= $stock > 1 ? 'es' : '' ?> disponible<?= $stock > 1 ? 's' : '' ?> para entrega inmediata
                         </div>
                     <?php else: ?>
-                        <div class="stock-info text-danger mb-4">
-                            <i class="bi bi-x-circle me-1"></i> Sin stock
+                        <div class="alert alert-danger py-3 mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Producto Agotado</strong> - No hay stock disponible en este momento
                         </div>
                     <?php endif; ?>
 
@@ -224,10 +238,11 @@ if (empty($p) || isset($p['error'])) {
                         <div class="col-sm-8 mb-3">
                             <label class="form-label d-none d-sm-block">&nbsp;</label>
                             <button type="button"
-                                    class="btn-add-cart btn-agregar"
+                                    class="btn-add-cart btn-agregar w-100"
                                     data-id="<?= $p['idProducto'] ?>"
-                                    <?= $stock === 0 ? 'disabled' : '' ?>>
-                                <i class="bi bi-cart-plus me-2"></i> Añadir al Carrito
+                                    <?= $stock === 0 ? 'disabled style="opacity: 0.6; cursor: not-allowed;"' : '' ?>>
+                                <i class="bi bi-<?= $stock > 0 ? 'cart-plus' : 'ban' ?> me-2"></i> 
+                                <?= $stock > 0 ? 'Añadir al Carrito' : 'No disponible' ?>
                             </button>
                         </div>
                     </div>

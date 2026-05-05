@@ -50,7 +50,34 @@ if (!$card) {
     exit;
 }
 
-// 4. Lógica de Saldo según el tipo de tarjeta
+// 4a. VALIDAR STOCK DISPONIBLE antes de procesar el pago
+$stockValido = true;
+$productosSinStock = [];
+
+$stockCheckStmt = $conexion->prepare("SELECT stock FROM productos WHERE idProducto = ?");
+
+foreach ($_SESSION['carrito'] as $idProducto => $item) {
+    $cantidad = $item['cantidad'];
+    $stockCheckStmt->bind_param('s', $idProducto);
+    $stockCheckStmt->execute();
+    $resultStockCheck = $stockCheckStmt->get_result();
+    $fila = $resultStockCheck->fetch_assoc();
+    
+    if (!$fila || (int)$fila['stock'] < $cantidad) {
+        $stockValido = false;
+        $productosSinStock[] = $idProducto;
+    }
+}
+$stockCheckStmt->close();
+
+if (!$stockValido) {
+    $_SESSION['checkout_message'] = 'Algunos productos no tienen suficiente stock: ' . implode(', ', $productosSinStock);
+    $_SESSION['checkout_message_type'] = 'error';
+    header('Location: ../checkout.php');
+    exit;
+}
+
+// 4b. Lógica de Saldo según el tipo de tarjeta
 $pagoAprobado = false;
 $nuevoSaldo = 0;
 
@@ -72,13 +99,13 @@ if ($card['tipo'] === 'Débito') {
 }
 
 if ($pagoAprobado) {
-    // 1. Actualizar saldo de tarjeta
+    // 5. Actualizar saldo de tarjeta
     $updateStmt = $conexion->prepare("UPDATE `tarjeta` SET saldo = ? WHERE idTarjeta = ?");
     $updateStmt->bind_param('di', $nuevoSaldo, $card['idTarjeta']);
     $updateStmt->execute();
     $updateStmt->close();
 
-    // 2. Calcular impuestos y crear factura
+    // 6. Calcular impuestos y crear factura
     $impuestos = round($subtotal * 0.07, 2);
     $totalFactura = round($subtotal + $impuestos, 2);
 
@@ -90,20 +117,32 @@ if ($pagoAprobado) {
     $idFactura = $facturaStmt->insert_id;
     $facturaStmt->close();
 
-    // 3. Guardar detalles de cada producto
+    // 7. Guardar detalles de cada producto y actualizar stock
     $detalleStmt = $conexion->prepare(
         "INSERT INTO factura_detalle (idFactura, idProducto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)"
+    );
+    
+    // Preparar statement para actualizar stock
+    $stockStmt = $conexion->prepare(
+        "UPDATE productos SET stock = stock - ? WHERE idProducto = ?"
     );
 
     foreach ($_SESSION['carrito'] as $idProducto => $item) {
         $cantidad = $item['cantidad'];
         $precio = round($item['precio'], 2);
+        
+        // Guardar detalle de factura
         $detalleStmt->bind_param('isid', $idFactura, $idProducto, $cantidad, $precio);
         $detalleStmt->execute();
+        
+        // Actualizar stock (restar cantidad vendida)
+        $stockStmt->bind_param('is', $cantidad, $idProducto);
+        $stockStmt->execute();
     }
     $detalleStmt->close();
+    $stockStmt->close();
 
-    // 4. Guardar ID de factura en sesión
+    // 8. Guardar ID de factura en sesión
     $_SESSION['idFacturaGenerada'] = $idFactura;
     $_SESSION['carrito'] = [];
     $_SESSION['checkout_message'] = 'Pago aprobado exitosamente.';

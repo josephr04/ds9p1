@@ -22,7 +22,7 @@ class MarcaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombreMarca' => 'required|string|max:25'
+            'nombreMarc' => 'required|string|max:50'
         ]);
         $marca = Marca::create($request->all());
         return response()->json($marca, 201);
