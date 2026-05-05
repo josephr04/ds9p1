@@ -4,11 +4,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Configuración de la API y obtención de categorías
+// Categorías desde la API
 $apiBase    = "http://127.0.0.1:8000/api";
 $catNav     = json_decode(@file_get_contents("$apiBase/categorias"), true) ?? [];
 
-// Lógica del contador del carrito
+// Contador del carrito
 $cartCount = 0;
 if (!empty($_SESSION['carrito'])) {
     foreach ($_SESSION['carrito'] as $item) {
@@ -22,103 +22,83 @@ if (!empty($_SESSION['carrito'])) {
 
         <!-- LOGO -->
         <a class="navbar-brand fw-bold text-primary d-flex align-items-center gap-2" href="store.php">
-             SellFlow
+            SellFlow
         </a>
 
-        <!-- BOTÓN MÓVIL (Hamburguesa) -->
+        <!-- BOTÓN MÓVIL -->
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContenido">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <!-- CONTENIDO DEL NAVBAR -->
+        <!-- CONTENIDO -->
         <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarContenido">
 
-            <!-- SECCIÓN IZQUIERDA: LINKS DE NAVEGACIÓN -->
-            <ul class="navbar-nav me-auto mb-3 mb-lg-0 gap-lg-2 text-center text-lg-start">
-                
-                <?php if (isset($_SESSION['empleado'])): ?>
-                    <?php if ($_SESSION['empleado']['rol'] == 1): ?>
-                        <!-- VISTA PARA ADMINISTRADOR -->
-                        <li class="nav-item">
-                            <a class="nav-link fw-semibold" href="store.php">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-primary fw-bold" href="index.php">
-                                <i class="bi bi-box-seam-fill me-1"></i>Panel Inventario
-                            </a>
-                        </li>
-                    <?php else: ?>
-                        <!-- VISTA PARA EMPLEADO ESTÁNDAR -->
-                        <li class="nav-item">
-                            <a class="nav-link text-primary fw-bold" href="empleado.php">
-                                <i class="bi bi-box-seam-fill me-1"></i>Panel Empleado
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                <?php else: ?>
-                    <!-- VISTA PARA CLIENTE/INVITADO -->
-                    <li class="nav-item">
-                        <a class="nav-link active fw-semibold" href="store.php">Inicio</a>
-                    </li>
-                <?php endif; ?>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="store.php?cat=0">Productos</a>
-                </li>
-
-                <!-- DROPDOWN DE CATEGORÍAS -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="dropCat" role="button" data-bs-toggle="dropdown">
-                        Categorías
+        <!-- LINKS -->
+        <ul class="navbar-nav me-auto mb-3 mb-lg-0 gap-lg-1 text-center text-lg-start align-items-lg-center">
+            <?php if (isset($_SESSION['empleado']) && $_SESSION['empleado']['rol'] == 1): ?>
+                <li class="nav-item border-start ps-3 ms-2">
+                    <a class="nav-link fw-semibold text-primary text-nowrap" href="index.php">
+                        Inventario
                     </a>
-                    <ul class="dropdown-menu shadow border-0 animate slideIn">
-                        <?php foreach ($catNav as $c): ?>
-                            <li>
-                                <a class="dropdown-item" href="store.php?cat=<?= $c['idCategoria'] ?>">
-                                    <?= htmlspecialchars($c['nombreCat']) ?>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                        
-                        <?php if (empty($catNav)): ?>
-                            <li><span class="dropdown-item text-muted">Sin categorías</span></li>
-                        <?php endif; ?>
-                    </ul>
                 </li>
-            </ul>
+                <li class="nav-item border-start ps-3 ms-2">
+                    <a class="nav-link fw-semibold text-primary text-nowrap" href="admin-empleados.php">
+                        Empleados
+                    </a>
+                </li>
+            <?php elseif (isset($_SESSION['empleado']) && $_SESSION['empleado']['rol'] != 1): ?>
+                <li class="nav-item border-start ps-3 ms-2">
+                    <a class="nav-link fw-semibold text-primary text-nowrap" href="empleado.php">
+                        Panel empleado
+                    </a>
+                </li>
+            <?php endif; ?>
 
-            <!-- SECCIÓN CENTRAL: BUSCADOR -->
-            <form class="d-flex w-100 w-lg-auto mb-3 mb-lg-0 position-relative me-lg-4" action="store.php" method="GET">
-                <input class="form-control rounded-pill ps-5" type="search" name="q" placeholder="Buscar productos...">
+            <li class="nav-item">
+                <a class="nav-link" href="store.php?cat=0">Productos</a>
+            </li>
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                    Categorías
+                </a>
+                <ul class="dropdown-menu shadow border-0">
+                    <?php foreach ($catNav as $c): ?>
+                        <li>
+                            <a class="dropdown-item" href="store.php?cat=<?= $c['idCategoria'] ?>">
+                                <?= htmlspecialchars($c['nombreCat']) ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                    <?php if (empty($catNav)): ?>
+                        <li><span class="dropdown-item text-muted">Sin categorías</span></li>
+                    <?php endif; ?>
+                </ul>
+            </li>
+
+        </ul>
+
+            <!-- BUSCADOR -->
+            <form class="d-flex w-100 w-lg-auto mb-3 mb-lg-0 position-relative mx-2">
+                <input class="form-control rounded-pill ps-5" type="search" placeholder="Buscar productos...">
                 <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
             </form>
 
-            <!-- SECCIÓN DERECHA: ICONOS DE USUARIO Y CARRITO -->
+            <!-- ICONOS -->
             <div class="d-flex justify-content-center justify-content-lg-end align-items-center gap-4">
 
                 <?php if (isset($_SESSION['empleado'])): ?>
-                    <!-- MENÚ DE PERFIL SI HAY SESIÓN -->
                     <div class="dropdown">
-                        <a href="#" class="text-dark dropdown-toggle d-flex align-items-center gap-1" data-bs-toggle="dropdown" style="text-decoration:none;">
-                            <i class="bi bi-person-circle fs-4 text-primary"></i>
-                            <span class="d-none d-lg-inline small fw-medium"><?= explode(' ', $_SESSION['empleado']['nombre'])[0] ?></span>
+                        <a href="#" class="text-dark dropdown-toggle" data-bs-toggle="dropdown" style="text-decoration:none;">
+                            <i class="bi bi-person-fill fs-4 text-primary"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                            <li class="px-3 py-2">
-                                <p class="mb-0 small text-muted">Conectado como:</p>
-                                <p class="mb-0 fw-bold small"><?= htmlspecialchars($_SESSION['empleado']['nombre']) ?></p>
+                            <li>
+                                <span class="dropdown-item-text small text-muted">
+                                    <?= htmlspecialchars($_SESSION['empleado']['nombre']) ?>
+                                </span>
                             </li>
                             <li><hr class="dropdown-divider"></li>
-                            
-                            <!-- Acceso rápido al panel desde el perfil para el Admin -->
-                            <?php if ($_SESSION['empleado']['rol'] == 1): ?>
-                                <li>
-                                    <a class="dropdown-item" href="index.php">
-                                        <i class="bi bi-speedometer2 me-2"></i>Ir al Dashboard
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-
                             <li>
                                 <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalPerfil">
                                     <i class="bi bi-person me-2"></i>Mi perfil
@@ -132,14 +112,12 @@ if (!empty($_SESSION['carrito'])) {
                         </ul>
                     </div>
                 <?php else: ?>
-                    <!-- BOTÓN LOGIN SI NO HAY SESIÓN -->
-                    <a href="login.php" class="text-dark hover-primary" title="Iniciar Sesión">
+                    <a href="login.php" class="text-dark">
                         <i class="bi bi-person fs-4"></i>
                     </a>
                 <?php endif; ?>
 
-                <!-- BOTÓN CARRITO -->
-                <a href="carrito.php" class="text-dark position-relative" title="Ver Carrito">
+                <a href="carrito.php" class="text-dark position-relative">
                     <i class="bi bi-bag fs-4"></i>
                     <span class="badge-carrito position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                         style="font-size: 0.65rem; <?= ($cartCount == 0) ? 'display: none;' : '' ?>">
@@ -153,13 +131,61 @@ if (!empty($_SESSION['carrito'])) {
     </div>
 </nav>
 
-<style>
-    /* Pequeño ajuste visual para mejorar la experiencia */
-    .hover-primary:hover { color: #0d6efd !important; transition: 0.3s; }
-    .nav-link:hover { color: #0d6efd !important; }
-    .dropdown-item:active { background-color: #0d6efd; }
-    
-    @media (max-width: 991px) {
-        .navbar-nav { padding-top: 1rem; }
-    }
-</style>
+<!-- MODAL PERFIL -->
+<div class="modal fade" id="modalPerfil" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius: 22px; box-shadow: 0 24px 60px rgba(15,23,42,0.15);">
+            <div class="modal-body p-4 text-center">
+
+                <!-- Avatar -->
+                <div class="mx-auto mb-3 d-flex align-items-center justify-content-center fw-bold text-white"
+                    style="width:72px;height:72px;border-radius:50%;background:#4f46e5;font-size:1.8rem;">
+                    <?= strtoupper(substr($_SESSION['empleado']['nombre'] ?? 'U', 0, 1)) ?>
+                </div>
+
+                <!-- Nombre y rol -->
+                <h5 class="fw-bold mb-1">
+                    <?= htmlspecialchars(($_SESSION['empleado']['nombre'] ?? '') . ' ' . ($_SESSION['empleado']['apellido'] ?? '')) ?>
+                </h5>
+                <span class="badge rounded-pill mb-4"
+                    style="background:<?= $_SESSION['empleado']['rol'] == 1 ? '#eff6ff' : '#f1f5f9' ?>;
+                        color:<?= $_SESSION['empleado']['rol'] == 1 ? '#1d4ed8' : '#475569' ?>;">
+                    <?= $_SESSION['empleado']['rol'] == 1 ? 'Administrador' : 'Empleado' ?>
+                </span>
+
+                <!-- Info -->
+                <div class="text-start border rounded-3 overflow-hidden mb-4">
+                    <div class="d-flex align-items-center gap-3 px-3 py-3 border-bottom">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-light" style="width:36px;height:36px;">
+                            <i class="bi bi-person text-muted"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted" style="font-size:0.75rem;">Usuario</div>
+                            <div class="fw-semibold">@<?= htmlspecialchars($_SESSION['empleado']['usuario'] ?? '') ?></div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 px-3 py-3 border-bottom">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-light" style="width:36px;height:36px;">
+                            <i class="bi bi-type text-muted"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted" style="font-size:0.75rem;">Nombre</div>
+                            <div class="fw-semibold"><?= htmlspecialchars($_SESSION['empleado']['nombre'] ?? '') ?></div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 px-3 py-3">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-light" style="width:36px;height:36px;">
+                            <i class="bi bi-type text-muted"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted" style="font-size:0.75rem;">Apellido</div>
+                            <div class="fw-semibold"><?= htmlspecialchars($_SESSION['empleado']['apellido'] ?? '') ?></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -239,8 +239,8 @@ include "includes/head.php";
     </div>
 
     <!-- FORM OCULTO para cambiar categoría sin GET en URL -->
-    <form id="formCategoria" method="POST" action="" style="display:none;">
-        <input type="hidden" name="cambiar_cat" id="inputCat" value="">
+    <form id="formCategoria" method="GET" action="store.php" style="display:none;">
+        <input type="hidden" name="cat" id="inputCat" value="">
     </form>
 
     <div class="container">
