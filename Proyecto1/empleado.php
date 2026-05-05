@@ -55,6 +55,7 @@ $stmt->close();
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <?php include "includes/head.php"; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Empleado · Verificación de Productos</title>
@@ -193,10 +194,6 @@ $stmt->close();
                 <h1 class="h3 fw-bold">Panel de Empleado</h1>
                 <p class="text-muted mb-0">Verifica productos con el lector de códigos de barras y revisa los datos de inventario.</p>
             </div>
-            <div class="d-flex gap-2">
-                <a href="store.php" class="btn btn-outline-secondary">Ver catálogo</a>
-                <a href="logout.php" class="btn btn-danger">Cerrar sesión</a>
-            </div>
         </div>
 
         <div class="panel-card p-4 mb-4">
@@ -229,7 +226,7 @@ $stmt->close();
                     <h2 class="h5 fw-semibold mb-1">Inventario</h2>
                     <p class="text-muted mb-0">Busca por código o nombre y navega 10 productos por página.</p>
                 </div>
-                <span class="badge bg-primary bg-opacity-15 text-primary rounded-pill px-3 py-2">Mostrando <?= number_format(count($productosPagina)) ?> de <?= number_format($totalProductos) ?></span>
+                <span class="badge bg-primary bg-opacity-15 text-primary rounded-pill px-3 py-2 text-white">Mostrando <?= number_format(count($productosPagina)) ?> de <?= number_format($totalProductos) ?></span>
             </div>
 
             <form method="get" class="row g-3 mb-4">
