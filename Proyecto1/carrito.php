@@ -308,7 +308,8 @@ $total_final = $subtotal + $envio + $impuestos;
                     <span id="resumen-total">$<?= number_format($total_final, 2) ?></span>
                 </div>
 
-                <button class="btn-proceed" onclick="location.href='checkout.php'">
+                <button class="btn-proceed" 
+                    <?= empty($_SESSION['carrito']) ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : "onclick=\"location.href='checkout.php'\"" ?>>
                     Proceder al pago
                 </button>
 

@@ -630,7 +630,7 @@ if (empty($categorias)) {
             document.getElementById("mensaje").className = "";
         }
     </script>
-
+    <?php include 'includes/footer.php'; ?>
 </body>
 
 </html>

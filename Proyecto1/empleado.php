@@ -393,5 +393,6 @@ $stmt->close();
             }, 4000);
         }
     </script>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>

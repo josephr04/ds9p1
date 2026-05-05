@@ -620,5 +620,6 @@ if ($_SESSION['empleado']['rol'] != 1) {
     // ── INIT ──
     cargarEmpleados();
 </script>
+<?php include 'includes/footer.php'; ?>
 </body>
 </html>

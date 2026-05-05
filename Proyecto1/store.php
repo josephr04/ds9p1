@@ -354,6 +354,7 @@ $categorias = $responseCategorias ? json_decode($responseCategorias, true) : [];
             }
         });
     </script>
+    <?php include 'includes/footer.php'; ?>
 </body>
 
 </html>
