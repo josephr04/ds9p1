@@ -1,3 +1,4 @@
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -33,15 +34,23 @@ if (!empty($_SESSION['carrito'])) {
         <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarContenido">
 
         <!-- LINKS -->
-        <ul class="navbar-nav me-auto mb-3 mb-lg-0 gap-lg-2 text-center text-lg-start">
-
+        <ul class="navbar-nav me-auto mb-3 mb-lg-0 gap-lg-1 text-center text-lg-start align-items-lg-center">
             <?php if (isset($_SESSION['empleado']) && $_SESSION['empleado']['rol'] == 1): ?>
-                <li class="nav-item">
-                    <a class="nav-link active fw-semibold" href="index.php">Inicio</a>
+                <li class="nav-item border-start ps-3 ms-2">
+                    <a class="nav-link fw-semibold text-primary text-nowrap" href="index.php">
+                        Inventario
+                    </a>
+                </li>
+                <li class="nav-item border-start ps-3 ms-2">
+                    <a class="nav-link fw-semibold text-primary text-nowrap" href="admin-empleados.php">
+                        Empleados
+                    </a>
                 </li>
             <?php elseif (isset($_SESSION['empleado']) && $_SESSION['empleado']['rol'] != 1): ?>
-                <li class="nav-item">
-                    <a class="nav-link active fw-semibold" href="empleado.php">Panel empleado</a>
+                <li class="nav-item border-start ps-3 ms-2">
+                    <a class="nav-link fw-semibold text-primary text-nowrap" href="empleado.php">
+                        Panel empleado
+                    </a>
                 </li>
             <?php endif; ?>
 
@@ -70,7 +79,7 @@ if (!empty($_SESSION['carrito'])) {
         </ul>
 
             <!-- BUSCADOR -->
-            <form class="d-flex w-100 w-lg-auto mb-3 mb-lg-0 position-relative">
+            <form class="d-flex w-100 w-lg-auto mb-3 mb-lg-0 position-relative mx-2">
                 <input class="form-control rounded-pill ps-5" type="search" placeholder="Buscar productos...">
                 <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
             </form>
@@ -91,7 +100,7 @@ if (!empty($_SESSION['carrito'])) {
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="perfil.php">
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalPerfil">
                                     <i class="bi bi-person me-2"></i>Mi perfil
                                 </a>
                             </li>
@@ -121,3 +130,62 @@ if (!empty($_SESSION['carrito'])) {
         </div>
     </div>
 </nav>
+
+<!-- MODAL PERFIL -->
+<div class="modal fade" id="modalPerfil" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius: 22px; box-shadow: 0 24px 60px rgba(15,23,42,0.15);">
+            <div class="modal-body p-4 text-center">
+
+                <!-- Avatar -->
+                <div class="mx-auto mb-3 d-flex align-items-center justify-content-center fw-bold text-white"
+                    style="width:72px;height:72px;border-radius:50%;background:#4f46e5;font-size:1.8rem;">
+                    <?= strtoupper(substr($_SESSION['empleado']['nombre'] ?? 'U', 0, 1)) ?>
+                </div>
+
+                <!-- Nombre y rol -->
+                <h5 class="fw-bold mb-1">
+                    <?= htmlspecialchars(($_SESSION['empleado']['nombre'] ?? '') . ' ' . ($_SESSION['empleado']['apellido'] ?? '')) ?>
+                </h5>
+                <span class="badge rounded-pill mb-4"
+                    style="background:<?= $_SESSION['empleado']['rol'] == 1 ? '#eff6ff' : '#f1f5f9' ?>;
+                        color:<?= $_SESSION['empleado']['rol'] == 1 ? '#1d4ed8' : '#475569' ?>;">
+                    <?= $_SESSION['empleado']['rol'] == 1 ? 'Administrador' : 'Empleado' ?>
+                </span>
+
+                <!-- Info -->
+                <div class="text-start border rounded-3 overflow-hidden mb-4">
+                    <div class="d-flex align-items-center gap-3 px-3 py-3 border-bottom">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-light" style="width:36px;height:36px;">
+                            <i class="bi bi-person text-muted"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted" style="font-size:0.75rem;">Usuario</div>
+                            <div class="fw-semibold">@<?= htmlspecialchars($_SESSION['empleado']['usuario'] ?? '') ?></div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 px-3 py-3 border-bottom">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-light" style="width:36px;height:36px;">
+                            <i class="bi bi-type text-muted"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted" style="font-size:0.75rem;">Nombre</div>
+                            <div class="fw-semibold"><?= htmlspecialchars($_SESSION['empleado']['nombre'] ?? '') ?></div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 px-3 py-3">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-light" style="width:36px;height:36px;">
+                            <i class="bi bi-type text-muted"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted" style="font-size:0.75rem;">Apellido</div>
+                            <div class="fw-semibold"><?= htmlspecialchars($_SESSION['empleado']['apellido'] ?? '') ?></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

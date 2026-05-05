@@ -224,7 +224,7 @@ $categorias = $responseCategorias ? json_decode($responseCategorias, true) : [];
     <div class="container">
         <header class="store-header text-center">
             <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3 fw-bold">CATÁLOGO 2026</span>
-            <h1 class="display-4 fw-extrabold mb-3">High Fidelity Electronics</h1>
+            <h1 class="display-4 fw-extrabold mb-3">SellFlow</h1>
             <p class="text-muted mx-auto" style="max-width: 600px;">Equipamiento de vanguardia diseñado para los entusiastas de la tecnología.</p>
         </header>
 
