@@ -906,6 +906,10 @@ unset($_SESSION['res_operacion'], $_SESSION['res_motivo']);
                                 <input type="number" step="0.01" id="edit_precio" class="form-control">
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea id="edit_descripcion" class="form-control" rows="3"></textarea>
+                        </div>
                     </div>
                     <div class="modal-footer border-top-0 p-4 pt-0">
                         <button class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Cancelar</button>
@@ -1299,6 +1303,7 @@ unset($_SESSION['res_operacion'], $_SESSION['res_motivo']);
                         document.getElementById("edit_nombre").value = data.nombre;
                         document.getElementById("edit_unidad").value = data.unidad;
                         document.getElementById("edit_precio").value = data.precioCosto;
+                        document.getElementById("edit_descripcion").value = data.descripcion;
                         document.getElementById("modalMensaje").innerHTML = "";
                         new bootstrap.Modal(document.getElementById("modalEditar")).show();
                     })
@@ -1313,8 +1318,9 @@ unset($_SESSION['res_operacion'], $_SESSION['res_motivo']);
                 const nombre = document.getElementById("edit_nombre").value.trim();
                 const unidad = document.getElementById("edit_unidad").value.trim();
                 const precio = document.getElementById("edit_precio").value;
+                const descripcion = document.getElementById("edit_descripcion").value.trim();
 
-                if (!nombre || !unidad || !precio) {
+                if (!nombre || !unidad || !precio || !descripcion) {
                     document.getElementById("modalMensaje").innerHTML = `
                 <div class="alert alert-warning alert-modern py-2 mb-3">
                     <i class="bi bi-exclamation-circle me-2"></i>Completa todos los campos antes de guardar.
@@ -1334,7 +1340,8 @@ unset($_SESSION['res_operacion'], $_SESSION['res_motivo']);
                         body: JSON.stringify({
                             nombre,
                             unidad,
-                            precioCosto: precio
+                            precioCosto: precio,
+                            descripcion
                         })
                     })
                     .then(res => {
